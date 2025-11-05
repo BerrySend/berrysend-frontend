@@ -30,13 +30,13 @@
     <div class="space-y-3">
       <!-- Capacity -->
       <div class="flex items-center justify-between text-sm">
-        <span class="text-gray-600">Capacity</span>
+        <span class="text-gray-600">Capacidad</span>
         <span class="font-medium text-gray-900">{{ port.getFormattedCapacity() }}</span>
       </div>
 
       <!-- Connections -->
       <div class="flex items-center justify-between text-sm">
-        <span class="text-gray-600">Connections</span>
+        <span class="text-gray-600">Conexiones</span>
         <span class="font-medium text-gray-900 flex items-center gap-1">
           <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -48,7 +48,7 @@
 
       <!-- Coordinates -->
       <div class="flex items-center justify-between text-sm">
-        <span class="text-gray-600">Coordinates</span>
+        <span class="text-gray-600">Coordenadas</span>
         <span class="font-mono text-xs text-gray-700">{{ port.getFormattedCoordinates() }}</span>
       </div>
     </div>
@@ -59,13 +59,13 @@
           @click="onEdit"
           class="flex-1 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
       >
-        Edit
+        Editar
       </button>
       <button
           @click="onViewDetails"
           class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
       >
-        Details
+        Detalles
       </button>
       <button
           @click="onDelete"
