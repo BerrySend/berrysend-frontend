@@ -134,63 +134,28 @@
 <script>
 import { ref, computed, onMounted, h } from 'vue';
 import NetworkGraph from '../components/network-graph.component.vue';
-import GraphNode from "@/export-management/model/graph-node.entity.js";
+import {graphService} from "@/export-management/services/graph.service.js";
 import GraphEdge from "@/export-management/model/graph-edge.entity.js";
-import { getMockGraphData } from '../services/mock-graph-data';
+import GraphNode from "@/export-management/model/graph-node.entity.js";
 
 // Icon components
-const EyeIcon = () => h('svg', {
-  class: 'w-4 h-4',
-  fill: 'none',
-  stroke: 'currentColor',
-  viewBox: '0 0 24 24'
-}, [
-  h('path', {
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'stroke-width': '2',
-    'd': 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'
-  }),
-  h('path', {
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'stroke-width': '2',
-    'd': 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'
-  })
+const EyeIcon = () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', 'd': 'M15 12a3 3 0 11-6 0 3 3 0 016 0z' }),
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', 'd': 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' })
 ]);
 
-const ShipIcon = () => h('svg', {
-  class: 'w-4 h-4',
-  fill: 'currentColor',
-  viewBox: '0 0 20 20'
-}, [
-  h('path', {
-    'd': 'M9 12l-4.95 2.6L3 13.5 6.5 9H3L1.5 7.5 2.3 5l2.7.8L7.5 3H9l-.5 3.5L12 5l.5 1.5-1.5 1.5h3.5l-3.5 4.5z'
-  })
+const ShipIcon = () => h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 0 20 20' }, [
+  h('path', { d: 'M9 12l-4.95 2.6L3 13.5 6.5 9H3L1.5 7.5 2.3 5l2.7.8L7.5 3H9l-.5 3.5L12 5l.5 1.5-1.5 1.5h3.5l-3.5 4.5z' })
 ]);
 
-const PlaneIcon = () => h('svg', {
-  class: 'w-4 h-4',
-  fill: 'currentColor',
-  viewBox: '0 0 20 20'
-}, [
-  h('path', {
-    'd': 'M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z'
-  })
+const PlaneIcon = () => h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 0 20 20' }, [
+  h('path', { d: 'M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z' })
 ]);
 
-/**
- * VisualizationPage Component
- * Main page for network graph visualization
- *
- * @component
- */
 export default {
   name: 'VisualizationPage',
 
-  components: {
-    NetworkGraph
-  },
+  components: { NetworkGraph },
 
   setup() {
     const activeTransportMode = ref('all');
@@ -199,59 +164,40 @@ export default {
     const optimalRoute = ref([]);
 
     const transportModes = [
-      {
-        id: 'all',
-        label: 'Etiquetas',
-        icon: EyeIcon,
-        activeClass: 'bg-blue-500 text-white'
-      },
-      {
-        id: 'maritime',
-        label: 'Marítimo',
-        icon: ShipIcon,
-        activeClass: 'bg-blue-500 text-white'
-      },
-      {
-        id: 'air',
-        label: 'Aéreo',
-        icon: PlaneIcon,
-        activeClass: 'bg-purple-500 text-white'
-      }
+      { id: 'all', label: 'Etiquetas', icon: EyeIcon, activeClass: 'bg-blue-500 text-white' },
+      { id: 'maritime', label: 'Marítimo', icon: ShipIcon, activeClass: 'bg-blue-500 text-white' },
+      { id: 'air', label: 'Aéreo', icon: PlaneIcon, activeClass: 'bg-purple-500 text-white' }
     ];
 
-    /**
-     * Calculate statistics from graph data
-     */
-    const statistics = computed(() => {
-      const originCount = graphNodes.value.filter(n => n.type === 'origin').length;
-      const destinationCount = graphNodes.value.filter(n => n.type === 'destination').length;
-      const maritimeCount = graphEdges.value.filter(e => e.mode === 'maritime').length;
-      const airCount = graphEdges.value.filter(e => e.mode === 'air').length;
+    const statistics = computed(() => ({
+      originPorts: graphNodes.value.filter(n => n.type === 'origin').length,
+      destinationPorts: graphNodes.value.filter(n => n.type === 'destination').length,
+      maritimeRoutes: graphEdges.value.filter(e => e.mode === 'maritime').length,
+      airRoutes: graphEdges.value.filter(e => e.mode === 'air').length,
+    }));
 
-      return {
-        originPorts: originCount,
-        destinationPorts: destinationCount,
-        maritimeRoutes: maritimeCount,
-        airRoutes: airCount
-      };
-    });
+    const loadGraphData = async () => {
+      try {
+        const [nodesRes, edgesRes, optimalRes] = await Promise.all([
+          graphService.getNodes(),
+          graphService.getEdges(),
+          graphService.getOptimalRoute()
+        ]);
 
-    /**
-     * Load graph data
-     */
-    const loadGraphData = () => {
-      const mockData = getMockGraphData();
+        // Instantiate as entity classes
+        graphNodes.value = nodesRes.data.map(node => new GraphNode(node));
+        graphEdges.value = edgesRes.data.map(edge => new GraphEdge(edge));
+        optimalRoute.value = optimalRes.data.map(edge => new GraphEdge(edge));
 
-      // Convert to entity instances
-      graphNodes.value = mockData.nodes.map(node => new GraphNode(node));
-      graphEdges.value = mockData.edges.map(edge => new GraphEdge(edge));
-      optimalRoute.value = mockData.optimalRoute;
+        console.log('Nodos recibidos:', graphNodes.value);
+        console.log('Aristas recibidas:', graphEdges.value);
+        console.log('Ruta óptima:', optimalRoute.value);
+      } catch (error) {
+        console.error('Error loading graph data:', error);
+      }
     };
 
-    // Lifecycle
-    onMounted(() => {
-      loadGraphData();
-    });
+    onMounted(loadGraphData);
 
     return {
       activeTransportMode,
@@ -264,6 +210,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .visualization-page {
