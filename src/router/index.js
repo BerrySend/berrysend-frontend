@@ -11,14 +11,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 const PortManagementPage = () => import('../port-management/pages/port-page.component.vue');
 
 // Route Optimization Module
-
+const OptimizationPage = () => import('../route-optimization/pages/optimization-page.component.vue');
 
 // Visualization Module
-
-
+const VisualizationPage = () => import('../export-management/pages/visualization-page.component.vue');
 
 // Shipment Planning Module
-
+//const ShipmentPlanningPage = () => import('../modules/shipment-planning/pages/shipment-planning-page.component.vue');
 
 /**
  * Route definitions
@@ -34,7 +33,38 @@ const routes = [
         component: PortManagementPage,
         meta: {
             title: 'Port Management',
-            description: 'Manage ports, routes and system configurations'
+            description: 'Manage ports, routes and system configurations',
+            icon: 'settings'
+        }
+    },
+    {
+        path: '/visualization',
+        name: 'Visualization',
+        component: VisualizationPage,
+        meta: {
+            title: 'Visualization',
+            description: 'Interactive visualization of route network',
+            icon: 'chart'
+        }
+    },
+    {
+        path: '/optimization',
+        name: 'Optimization',
+        component: OptimizationPage,
+        meta: {
+            title: 'Route Optimization',
+            description: 'Configure and execute optimization algorithms',
+            icon: 'lightning'
+        }
+    },
+    {
+        path: '/shipments',
+        name: 'ShipmentPlanning',
+        //component: ShipmentPlanningPage,
+        meta: {
+            title: 'Shipment Planning',
+            description: 'Create and manage shipment plans',
+            icon: 'package'
         }
     },
     {

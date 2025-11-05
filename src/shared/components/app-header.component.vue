@@ -17,7 +17,7 @@
             </span>
           </h1>
           <p class="text-sm text-gray-600">
-            Mathematical route optimization for blueberry exports from Peru
+            Optimización matemática de rutas para exportación de arándanos desde Perú
           </p>
         </div>
       </div>
@@ -26,17 +26,17 @@
       <div class="flex items-center gap-8">
         <StatCard
             :value="statistics.originPorts"
-            label="Origin Ports"
+            label="Puertos de Origen"
             color="blue"
         />
         <StatCard
             :value="statistics.destinations"
-            label="Destinations"
+            label="Destinos"
             color="purple"
         />
         <StatCard
             :value="statistics.activeRoutes"
-            label="Active Routes"
+            label="Rutas Activas"
             color="orange"
         />
       </div>
@@ -48,10 +48,10 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
       </svg>
-      <span>Mathematical Algorithms</span>
+      <span>Algoritmos Matemáticos</span>
       <span class="mx-2 text-gray-400">•</span>
       <span class="flex items-center gap-1">
-        🔗 Multi-modal Optimization
+        🔗 Optimización Multimodal
       </span>
     </div>
   </header>
