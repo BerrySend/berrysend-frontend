@@ -14,8 +14,7 @@ const PortManagementPage = () => import('../port-management/pages/port-page.comp
 const OptimizationPage = () => import('../route-optimization/pages/optimization-page.component.vue');
 
 // Visualization Module
-//const VisualizationPage = () => import('../modules/visualization/pages/visualization-page.component.vue');
-//const ResultsPage = () => import('../modules/visualization/pages/results-page.component.vue');
+const VisualizationPage = () => import('../export-management/pages/visualization-page.component.vue');
 
 // Shipment Planning Module
 //const ShipmentPlanningPage = () => import('../modules/shipment-planning/pages/shipment-planning-page.component.vue');
@@ -41,7 +40,7 @@ const routes = [
     {
         path: '/visualization',
         name: 'Visualization',
-        //component: VisualizationPage,
+        component: VisualizationPage,
         meta: {
             title: 'Visualization',
             description: 'Interactive visualization of route network',
@@ -56,16 +55,6 @@ const routes = [
             title: 'Route Optimization',
             description: 'Configure and execute optimization algorithms',
             icon: 'lightning'
-        }
-    },
-    {
-        path: '/results',
-        name: 'Results',
-        //component: ResultsPage,
-        meta: {
-            title: 'Optimization Results',
-            description: 'View and analyze optimization results',
-            icon: 'chart'
         }
     },
     {
