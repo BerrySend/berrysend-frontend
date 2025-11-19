@@ -5,8 +5,8 @@
  * @module shared/stores/authStore
  */
 
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import {defineStore} from 'pinia';
+import {computed, ref} from 'vue';
 import authService from "@/auth/services/auth.service.js";
 import {User} from "@/auth/model/user.entity.js";
 import {AuthToken} from "@/auth/model/auth-token.entity.js";
@@ -184,8 +184,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         try {
-            const newToken = await authService.refreshToken(token.value.refreshToken);
-            token.value = newToken;
+            token.value = await authService.refreshToken(token.value.refreshToken);
             saveToStorage();
         } catch (err) {
             console.error('Error refreshing token:', err);
