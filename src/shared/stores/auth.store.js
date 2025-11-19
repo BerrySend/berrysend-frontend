@@ -127,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
      * @param {Object} userData - User registration data
      * @param {string} userData.email - User email
      * @param {string} userData.password - User password
-     * @param {string} userData.name - User name
+     * @param {string} userData.name - Username
      * @returns {Promise<void>}
      */
     const register = async (userData) => {
@@ -188,7 +188,7 @@ export const useAuthStore = defineStore('auth', () => {
             saveToStorage();
         } catch (err) {
             console.error('Error refreshing token:', err);
-            logout();
+            await logout();
             throw err;
         }
     }
@@ -214,7 +214,7 @@ export const useAuthStore = defineStore('auth', () => {
             
             // If unauthorized, logout
             if (err.message === 'Unauthorized') {
-                logout();
+                await logout();
             }
             
             throw err;
