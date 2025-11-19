@@ -6,7 +6,10 @@
       "type": "origin",
       "x": 100,
       "y": 450,
-      "coordinates": { "latitude": -12.05, "longitude": -77.14 }
+      "coordinates": {
+        "latitude": -12.05,
+        "longitude": -77.14
+      }
     },
     {
       "id": "balboa",
@@ -14,7 +17,10 @@
       "type": "intermediate",
       "x": 200,
       "y": 400,
-      "coordinates": { "latitude": 8.95, "longitude": -79.55 }
+      "coordinates": {
+        "latitude": 8.95,
+        "longitude": -79.55
+      }
     },
     {
       "id": "santos",
@@ -22,7 +28,10 @@
       "type": "intermediate",
       "x": 250,
       "y": 500,
-      "coordinates": { "latitude": -23.96, "longitude": -46.33 }
+      "coordinates": {
+        "latitude": -23.96,
+        "longitude": -46.33
+      }
     },
     {
       "id": "losangeles",
@@ -30,7 +39,10 @@
       "type": "intermediate",
       "x": 150,
       "y": 300,
-      "coordinates": { "latitude": 33.74, "longitude": -118.27 }
+      "coordinates": {
+        "latitude": 33.74,
+        "longitude": -118.27
+      }
     },
     {
       "id": "miami",
@@ -38,7 +50,10 @@
       "type": "intermediate",
       "x": 300,
       "y": 350,
-      "coordinates": { "latitude": 25.77, "longitude": -80.19 }
+      "coordinates": {
+        "latitude": 25.77,
+        "longitude": -80.19
+      }
     },
     {
       "id": "nuevayork",
@@ -46,7 +61,10 @@
       "type": "intermediate",
       "x": 350,
       "y": 280,
-      "coordinates": { "latitude": 40.71, "longitude": -74.01 }
+      "coordinates": {
+        "latitude": 40.71,
+        "longitude": -74.01
+      }
     },
     {
       "id": "rotterdam",
@@ -54,7 +72,10 @@
       "type": "intermediate",
       "x": 500,
       "y": 250,
-      "coordinates": { "latitude": 51.92, "longitude": 4.48 }
+      "coordinates": {
+        "latitude": 51.92,
+        "longitude": 4.48
+      }
     },
     {
       "id": "hamburgo",
@@ -62,7 +83,10 @@
       "type": "intermediate",
       "x": 520,
       "y": 230,
-      "coordinates": { "latitude": 53.55, "longitude": 9.99 }
+      "coordinates": {
+        "latitude": 53.55,
+        "longitude": 9.99
+      }
     },
     {
       "id": "shanghai",
@@ -70,7 +94,10 @@
       "type": "destination",
       "x": 750,
       "y": 300,
-      "coordinates": { "latitude": 31.23, "longitude": 121.47 }
+      "coordinates": {
+        "latitude": 31.23,
+        "longitude": 121.47
+      }
     },
     {
       "id": "tokyo",
@@ -78,48 +105,303 @@
       "type": "destination",
       "x": 820,
       "y": 270,
-      "coordinates": { "latitude": 35.65, "longitude": 139.84 }
+      "coordinates": {
+        "latitude": 35.65,
+        "longitude": 139.84
+      }
     }
   ],
   "edges": [
-    { "source": "callao", "target": "balboa", "mode": "maritime", "distance": 2800, "time": 4, "cost": 45000 },
-    { "source": "callao", "target": "losangeles", "mode": "maritime", "distance": 6500, "time": 14, "cost": 85000 },
-    { "source": "callao", "target": "santos", "mode": "maritime", "distance": 5200, "time": 12, "cost": 65000 },
-    { "source": "balboa", "target": "miami", "mode": "maritime", "distance": 3200, "time": 7, "cost": 50000 },
-    { "source": "balboa", "target": "rotterdam", "mode": "maritime", "distance": 9600, "time": 20, "cost": 120000 },
-    { "source": "balboa", "target": "shanghai", "mode": "maritime", "distance": 18000, "time": 32, "cost": 180000 },
-    { "source": "losangeles", "target": "shanghai", "mode": "maritime", "distance": 11000, "time": 18, "cost": 110000 },
-    { "source": "losangeles", "target": "tokyo", "mode": "maritime", "distance": 9000, "time": 14, "cost": 95000 },
-    { "source": "losangeles", "target": "miami", "mode": "air", "distance": 3500, "time": 1, "cost": 85000 },
-    { "source": "miami", "target": "nuevayork", "mode": "maritime", "distance": 2000, "time": 3, "cost": 35000 },
-    { "source": "miami", "target": "rotterdam", "mode": "maritime", "distance": 7800, "time": 15, "cost": 95000 },
-    { "source": "nuevayork", "target": "rotterdam", "mode": "maritime", "distance": 6000, "time": 13, "cost": 80000 },
-    { "source": "nuevayork", "target": "hamburgo", "mode": "maritime", "distance": 6500, "time": 14, "cost": 85000 },
-    { "source": "rotterdam", "target": "shanghai", "mode": "maritime", "distance": 19000, "time": 32, "cost": 150000 },
-    { "source": "rotterdam", "target": "hamburgo", "mode": "maritime", "distance": 600, "time": 1, "cost": 10000 },
-    { "source": "hamburgo", "target": "shanghai", "mode": "maritime", "distance": 18500, "time": 30, "cost": 145000 },
-    { "source": "santos", "target": "rotterdam", "mode": "maritime", "distance": 10500, "time": 22, "cost": 125000 },
-    { "source": "santos", "target": "shanghai", "mode": "maritime", "distance": 20000, "time": 35, "cost": 190000 }
+    {
+      "source": "callao",
+      "target": "balboa",
+      "mode": "maritime",
+      "distance": 2800,
+      "time": 4,
+      "cost": 45000
+    },
+    {
+      "source": "callao",
+      "target": "losangeles",
+      "mode": "maritime",
+      "distance": 6500,
+      "time": 14,
+      "cost": 85000
+    },
+    {
+      "source": "callao",
+      "target": "santos",
+      "mode": "maritime",
+      "distance": 5200,
+      "time": 12,
+      "cost": 65000
+    },
+    {
+      "source": "balboa",
+      "target": "miami",
+      "mode": "maritime",
+      "distance": 3200,
+      "time": 7,
+      "cost": 50000
+    },
+    {
+      "source": "balboa",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 9600,
+      "time": 20,
+      "cost": 120000
+    },
+    {
+      "source": "balboa",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 18000,
+      "time": 32,
+      "cost": 180000
+    },
+    {
+      "source": "losangeles",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 11000,
+      "time": 18,
+      "cost": 110000
+    },
+    {
+      "source": "losangeles",
+      "target": "tokyo",
+      "mode": "maritime",
+      "distance": 9000,
+      "time": 14,
+      "cost": 95000
+    },
+    {
+      "source": "losangeles",
+      "target": "miami",
+      "mode": "air",
+      "distance": 3500,
+      "time": 1,
+      "cost": 85000
+    },
+    {
+      "source": "miami",
+      "target": "nuevayork",
+      "mode": "maritime",
+      "distance": 2000,
+      "time": 3,
+      "cost": 35000
+    },
+    {
+      "source": "miami",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 7800,
+      "time": 15,
+      "cost": 95000
+    },
+    {
+      "source": "nuevayork",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 6000,
+      "time": 13,
+      "cost": 80000
+    },
+    {
+      "source": "nuevayork",
+      "target": "hamburgo",
+      "mode": "maritime",
+      "distance": 6500,
+      "time": 14,
+      "cost": 85000
+    },
+    {
+      "source": "rotterdam",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 19000,
+      "time": 32,
+      "cost": 150000
+    },
+    {
+      "source": "rotterdam",
+      "target": "hamburgo",
+      "mode": "maritime",
+      "distance": 600,
+      "time": 1,
+      "cost": 10000
+    },
+    {
+      "source": "hamburgo",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 18500,
+      "time": 30,
+      "cost": 145000
+    },
+    {
+      "source": "santos",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 10500,
+      "time": 22,
+      "cost": 125000
+    },
+    {
+      "source": "santos",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 20000,
+      "time": 35,
+      "cost": 190000
+    }
   ],
   "routes": [
-    { "source": "callao", "target": "balboa", "mode": "maritime", "distance": 2800, "time": 4, "cost": 45000 },
-    { "source": "callao", "target": "losangeles", "mode": "maritime", "distance": 6500, "time": 14, "cost": 85000 },
-    { "source": "callao", "target": "santos", "mode": "maritime", "distance": 5200, "time": 12, "cost": 65000 },
-    { "source": "balboa", "target": "miami", "mode": "maritime", "distance": 3200, "time": 7, "cost": 50000 },
-    { "source": "balboa", "target": "rotterdam", "mode": "maritime", "distance": 9600, "time": 20, "cost": 120000 },
-    { "source": "balboa", "target": "shanghai", "mode": "maritime", "distance": 18000, "time": 32, "cost": 180000 },
-    { "source": "losangeles", "target": "shanghai", "mode": "maritime", "distance": 11000, "time": 18, "cost": 110000 },
-    { "source": "losangeles", "target": "tokyo", "mode": "maritime", "distance": 9000, "time": 14, "cost": 95000 },
-    { "source": "losangeles", "target": "miami", "mode": "air", "distance": 3500, "time": 1, "cost": 85000 },
-    { "source": "miami", "target": "nuevayork", "mode": "maritime", "distance": 2000, "time": 3, "cost": 35000 },
-    { "source": "miami", "target": "rotterdam", "mode": "maritime", "distance": 7800, "time": 15, "cost": 95000 },
-    { "source": "nuevayork", "target": "rotterdam", "mode": "maritime", "distance": 6000, "time": 13, "cost": 80000 },
-    { "source": "nuevayork", "target": "hamburgo", "mode": "maritime", "distance": 6500, "time": 14, "cost": 85000 },
-    { "source": "rotterdam", "target": "shanghai", "mode": "maritime", "distance": 19000, "time": 32, "cost": 150000 },
-    { "source": "rotterdam", "target": "hamburgo", "mode": "maritime", "distance": 600, "time": 1, "cost": 10000 },
-    { "source": "hamburgo", "target": "shanghai", "mode": "maritime", "distance": 18500, "time": 30, "cost": 145000 },
-    { "source": "santos", "target": "rotterdam", "mode": "maritime", "distance": 10500, "time": 22, "cost": 125000 },
-    { "source": "santos", "target": "shanghai", "mode": "maritime", "distance": 20000, "time": 35, "cost": 190000 }
+    {
+      "source": "callao",
+      "target": "balboa",
+      "mode": "maritime",
+      "distance": 2800,
+      "time": 4,
+      "cost": 45000
+    },
+    {
+      "source": "callao",
+      "target": "losangeles",
+      "mode": "maritime",
+      "distance": 6500,
+      "time": 14,
+      "cost": 85000
+    },
+    {
+      "source": "callao",
+      "target": "santos",
+      "mode": "maritime",
+      "distance": 5200,
+      "time": 12,
+      "cost": 65000
+    },
+    {
+      "source": "balboa",
+      "target": "miami",
+      "mode": "maritime",
+      "distance": 3200,
+      "time": 7,
+      "cost": 50000
+    },
+    {
+      "source": "balboa",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 9600,
+      "time": 20,
+      "cost": 120000
+    },
+    {
+      "source": "balboa",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 18000,
+      "time": 32,
+      "cost": 180000
+    },
+    {
+      "source": "losangeles",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 11000,
+      "time": 18,
+      "cost": 110000
+    },
+    {
+      "source": "losangeles",
+      "target": "tokyo",
+      "mode": "maritime",
+      "distance": 9000,
+      "time": 14,
+      "cost": 95000
+    },
+    {
+      "source": "losangeles",
+      "target": "miami",
+      "mode": "air",
+      "distance": 3500,
+      "time": 1,
+      "cost": 85000
+    },
+    {
+      "source": "miami",
+      "target": "nuevayork",
+      "mode": "maritime",
+      "distance": 2000,
+      "time": 3,
+      "cost": 35000
+    },
+    {
+      "source": "miami",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 7800,
+      "time": 15,
+      "cost": 95000
+    },
+    {
+      "source": "nuevayork",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 6000,
+      "time": 13,
+      "cost": 80000
+    },
+    {
+      "source": "nuevayork",
+      "target": "hamburgo",
+      "mode": "maritime",
+      "distance": 6500,
+      "time": 14,
+      "cost": 85000
+    },
+    {
+      "source": "rotterdam",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 19000,
+      "time": 32,
+      "cost": 150000
+    },
+    {
+      "source": "rotterdam",
+      "target": "hamburgo",
+      "mode": "maritime",
+      "distance": 600,
+      "time": 1,
+      "cost": 10000
+    },
+    {
+      "source": "hamburgo",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 18500,
+      "time": 30,
+      "cost": 145000
+    },
+    {
+      "source": "santos",
+      "target": "rotterdam",
+      "mode": "maritime",
+      "distance": 10500,
+      "time": 22,
+      "cost": 125000
+    },
+    {
+      "source": "santos",
+      "target": "shanghai",
+      "mode": "maritime",
+      "distance": 20000,
+      "time": 35,
+      "cost": 190000
+    }
   ],
   "optimalRoute": [
     "callao",
@@ -135,7 +417,10 @@
       "type": "origin",
       "capacity": 3500000,
       "connections": 5,
-      "coordinates": { "latitude": -12.05, "longitude": -77.14 }
+      "coordinates": {
+        "latitude": -12.05,
+        "longitude": -77.14
+      }
     },
     {
       "id": "balboa",
@@ -144,7 +429,10 @@
       "type": "intermediate",
       "capacity": 2500000,
       "connections": 4,
-      "coordinates": { "latitude": 8.95, "longitude": -79.55 }
+      "coordinates": {
+        "latitude": 8.95,
+        "longitude": -79.55
+      }
     },
     {
       "id": "santos",
@@ -153,7 +441,10 @@
       "type": "intermediate",
       "capacity": 3000000,
       "connections": 3,
-      "coordinates": { "latitude": -23.96, "longitude": -46.33 }
+      "coordinates": {
+        "latitude": -23.96,
+        "longitude": -46.33
+      }
     },
     {
       "id": "losangeles",
@@ -162,7 +453,10 @@
       "type": "intermediate",
       "capacity": 5000000,
       "connections": 6,
-      "coordinates": { "latitude": 33.74, "longitude": -118.27 }
+      "coordinates": {
+        "latitude": 33.74,
+        "longitude": -118.27
+      }
     },
     {
       "id": "miami",
@@ -171,7 +465,10 @@
       "type": "intermediate",
       "capacity": 1800000,
       "connections": 4,
-      "coordinates": { "latitude": 25.77, "longitude": -80.19 }
+      "coordinates": {
+        "latitude": 25.77,
+        "longitude": -80.19
+      }
     },
     {
       "id": "rotterdam",
@@ -180,7 +477,10 @@
       "type": "intermediate",
       "capacity": 6000000,
       "connections": 8,
-      "coordinates": { "latitude": 51.92, "longitude": 4.48 }
+      "coordinates": {
+        "latitude": 51.92,
+        "longitude": 4.48
+      }
     },
     {
       "id": "shanghai",
@@ -189,7 +489,44 @@
       "type": "destination",
       "capacity": 7000000,
       "connections": 10,
-      "coordinates": { "latitude": 31.23, "longitude": 121.47 }
+      "coordinates": {
+        "latitude": 31.23,
+        "longitude": 121.47
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@berrysend.com",
+      "password": "admin123",
+      "name": "Admin User",
+      "role": "admin",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "email": "user@berrysend.com",
+      "password": "user123",
+      "name": "Test User",
+      "role": "user",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "email": "martingonzales42615@gmail.com",
+      "password": "12345678",
+      "name": "Angel Martin Gonzales Castillo",
+      "role": "user",
+      "createdAt": "2025-11-19T14:47:18.931Z",
+      "id": "gxWqxyA"
+    },
+    {
+      "email": "prueba@gmail.com",
+      "password": "123456789",
+      "name": "Prueba1",
+      "role": "user",
+      "createdAt": "2025-11-19T16:47:03.884Z",
+      "id": "iHXiLfH"
     }
   ]
 }
