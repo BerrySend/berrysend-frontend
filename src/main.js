@@ -6,9 +6,17 @@
  */
 
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
+import { setupAxiosInterceptor } from './shared/interceptors/axios.interceptor.js';
+import { useAuthStore } from './shared/stores/auth.store.js';
 import './assets/tailwind.css';
+
+/**
+ * Create Pinia instance
+ */
+const pinia = createPinia();
 
 /**
  * Create Vue application instance
@@ -52,7 +60,19 @@ app.config.globalProperties.$version = '1.0.0';
 /**
  * Install plugins
  */
+app.use(pinia);
 app.use(router);
+
+/**
+ * Setup axios interceptor for authentication
+ */
+setupAxiosInterceptor();
+
+/**
+ * Initialize auth store from localStorage
+ */
+const authStore = useAuthStore();
+authStore.initialize();
 
 /**
  * Mount application to DOM
