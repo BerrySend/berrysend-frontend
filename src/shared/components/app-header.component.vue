@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <!-- Statistics -->
+      <!-- Statistics and User Menu -->
       <div class="flex items-center gap-8">
         <StatCard
             :value="statistics.originPorts"
@@ -39,6 +39,23 @@
             label="Rutas Activas"
             color="orange"
         />
+
+        <!-- User Menu -->
+        <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+          <div class="text-right">
+            <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name || 'User' }}</p>
+            <p class="text-xs text-gray-500">{{ authStore.user?.email }}</p>
+          </div>
+          <button
+              @click="handleLogout"
+              class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Logout"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -58,6 +75,8 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/shared/stores/auth.store.js';
 import StatCard from '@/shared/components/stat-card.component.vue';
 
 /**
@@ -88,6 +107,28 @@ export default {
         );
       }
     }
+  },
+
+  setup() {
+    const router = useRouter();
+    const authStore = useAuthStore();
+
+    /**
+     * Handles logout action
+     */
+    const handleLogout = async () => {
+      try {
+        await authStore.logout();
+        router.push('/login');
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
+    };
+
+    return {
+      authStore,
+      handleLogout
+    };
   }
 };
 </script>
