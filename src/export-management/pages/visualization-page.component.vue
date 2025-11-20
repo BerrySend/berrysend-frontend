@@ -187,11 +187,53 @@ export default {
         // Instantiate as entity classes
         graphNodes.value = nodesRes.data.map(node => new GraphNode(node));
         graphEdges.value = edgesRes.data.map(edge => new GraphEdge(edge));
-        optimalRoute.value = optimalRes.data.map(edge => new GraphEdge(edge));
+
+        // Procesar ruta óptima: convertir array de IDs de nodos en array de aristas
+        const routeNodeIds = optimalRes.data;
+        const optimalRouteEdges = [];
+
+        // Si la ruta óptima es un array de IDs de nodos, encontrar las aristas que los conectan
+        if (Array.isArray(routeNodeIds) && routeNodeIds.length > 0) {
+          // Si el primer elemento es un string (ID de nodo), construir las aristas
+          if (typeof routeNodeIds[0] === 'string') {
+            for (let i = 0; i < routeNodeIds.length - 1; i++) {
+              const fromId = routeNodeIds[i];
+              const toId = routeNodeIds[i + 1];
+
+              // Buscar la arista que conecta estos nodos
+              const edge = graphEdges.value.find(e =>
+                (e.source === fromId && e.target === toId) ||
+                (e.source === toId && e.target === fromId) ||
+                (e.port_a_id === fromId && e.port_b_id === toId) ||
+                (e.port_a_id === toId && e.port_b_id === fromId)
+              );
+
+              if (edge) {
+                optimalRouteEdges.push(edge);
+              } else {
+                // Si no existe la arista, crear una ficticia para la ruta
+                optimalRouteEdges.push(new GraphEdge({
+                  source: fromId,
+                  target: toId,
+                  mode: 'maritime',
+                  distance: 0,
+                  time: 0,
+                  cost: 0,
+                  isOptimal: true
+                }));
+              }
+            }
+          } else {
+            // Si ya son edges, simplemente mapearlos
+            optimalRouteEdges.push(...routeNodeIds.map(edge => new GraphEdge(edge)));
+          }
+        }
+
+        optimalRoute.value = optimalRouteEdges;
 
         console.log('Nodos recibidos:', graphNodes.value);
         console.log('Aristas recibidas:', graphEdges.value);
-        console.log('Ruta óptima:', optimalRoute.value);
+        console.log('Ruta óptima (procesada):', optimalRoute.value);
       } catch (error) {
         console.error('Error loading graph data:', error);
       }
