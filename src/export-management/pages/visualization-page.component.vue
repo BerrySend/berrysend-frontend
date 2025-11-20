@@ -76,13 +76,12 @@
 
     <!-- Graph Visualization -->
     <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-      <NetworkGraph
+      <GoogleMapsGraph
           :nodes="graphNodes"
           :edges="graphEdges"
           :optimal-route="optimalRoute"
           :transport-mode="activeTransportMode"
           :width="900"
-          :height="500"
       />
     </div>
 
@@ -137,6 +136,7 @@ import NetworkGraph from '../components/network-graph.component.vue';
 import {graphService} from "@/export-management/services/graph.service.js";
 import GraphEdge from "@/export-management/model/graph-edge.entity.js";
 import GraphNode from "@/export-management/model/graph-node.entity.js";
+import GoogleMapsGraph from "@/export-management/components/google-maps-graph.component.vue";
 
 // Icon components
 const EyeIcon = () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
@@ -155,7 +155,7 @@ const PlaneIcon = () => h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewB
 export default {
   name: 'VisualizationPage',
 
-  components: { NetworkGraph },
+  components: {GoogleMapsGraph, NetworkGraph },
 
   setup() {
     const activeTransportMode = ref('all');
