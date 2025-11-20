@@ -52,9 +52,8 @@ export default {
     let google = null;
     let setOptionsInitialized = false;
 
-    // ✅ CRÍTICO: setOptions ANTES de hacer cualquier otra cosa
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    console.log('Configurando Google Maps con API Key:', apiKey ? 'presente' : 'NO PRESENTE');
+
 
     if (apiKey && !setOptionsInitialized) {
       setOptions({
@@ -63,39 +62,30 @@ export default {
       });
       setOptionsInitialized = true;
     } else {
-      console.error('VITE_GOOGLE_MAPS_API_KEY no está configurada');
+      console.error('VITE_GOOGLE_MAPS_API_KEY is not configured');
     }
 
-    // Validar que las coordenadas sean números válidos
     const isValidCoordinate = (lat, lng) => {
       return typeof lat === 'number' && typeof lng === 'number' &&
-             isFinite(lat) && isFinite(lng) &&
-             lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+          isFinite(lat) && isFinite(lng) &&
+          lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
     };
 
-    // Garantizar que lat/lng sean números, accediendo directamente a coordinates
     const getCoordinates = (node) => {
-      // Intentar diferentes formas de acceder a las coordenadas
       let lat = node?.coordinates?.latitude || node?.lat;
       let lng = node?.coordinates?.longitude || node?.lng;
 
       lat = parseFloat(lat);
       lng = parseFloat(lng);
 
-      return { lat, lng };
+      return {lat, lng};
     };
 
     const initMap = async () => {
       try {
-        console.log('Iniciando mapa...');
-
-        // Importar las bibliotecas necesarias
         const mapsLib = await importLibrary('maps');
         const markerLib = await importLibrary('marker');
 
-        console.log('Librerías importadas:', { mapsLib: !!mapsLib, markerLib: !!markerLib });
-
-        // Asignar referencias globales
         AdvancedMarkerElement = markerLib?.AdvancedMarkerElement;
         google = mapsLib;
 
@@ -111,12 +101,10 @@ export default {
           mapCenter.lng = 0;
         }
 
-        console.log('Creando mapa en:', mapContainer.value, 'con centro:', mapCenter);
-
         map = new google.Map(mapContainer.value, {
           zoom: 4,
           center: mapCenter,
-          mapId: 'berrysend-map',                  // ✅ REQUERIDO para AdvancedMarkerElement
+          mapId: 'berrysend-map',
           mapTypeControl: false,
           fullscreenControl: false,
           zoomControl: true,
@@ -134,7 +122,6 @@ export default {
             },
             strictBounds: false
           },
-          // ✅ Estilo personalizado para minimizar marca de agua
           styles: [
             {
               "elementType": "labels.text.fill",
@@ -147,47 +134,41 @@ export default {
           ]
         });
 
-        console.log('Mapa creado exitosamente');
-
-        // Dibujar cuando la API y el mapa estén listos
         renderNodes();
         renderEdges();
         renderOptimalRoute();
       } catch (err) {
-        console.error('Error inicializando Google Maps:', err);
+        console.error('Error initializing Google Maps:', err);
       }
     };
 
     const calculateCenter = () => {
-      if (props.nodes.length === 0) return { lat: 20, lng: 0 };
+      if (props.nodes.length === 0) return {lat: 20, lng: 0};
 
       let validNodes = props.nodes.filter(n => {
-        const { lat, lng } = getCoordinates(n);
+        const {lat, lng} = getCoordinates(n);
         return isValidCoordinate(lat, lng);
       });
 
-      if (validNodes.length === 0) return { lat: 20, lng: 0 };
+      if (validNodes.length === 0) return {lat: 20, lng: 0};
 
       const lat = validNodes.reduce((sum, n) => {
-        const { lat } = getCoordinates(n);
+        const {lat} = getCoordinates(n);
         return sum + lat;
       }, 0) / validNodes.length;
 
       const lng = validNodes.reduce((sum, n) => {
-        const { lng } = getCoordinates(n);
+        const {lng} = getCoordinates(n);
         return sum + lng;
       }, 0) / validNodes.length;
 
-      return { lat, lng };
+      return {lat, lng};
     };
 
     const renderNodes = () => {
       if (!map || !google) {
-        console.warn('❌ Map or google not ready', { map: !!map, google: !!google });
         return;
       }
-
-      // Limpiar marcadores anteriores
       markers.forEach(m => {
         try {
           if (m.map) m.map = null;
@@ -198,43 +179,27 @@ export default {
       });
       markers = [];
 
-      console.log('📍 Rendering nodes:', props.nodes.length);
+
       if (props.nodes.length === 0) {
-        console.warn('⚠️ No nodes to render');
         return;
       }
 
       let successCount = 0;
       let errorCount = 0;
 
-      props.nodes.forEach((node, idx) => {
-        const { lat, lng } = getCoordinates(node);
+      props.nodes.forEach((node) => {
+        const {lat, lng} = getCoordinates(node);
 
-        // Log para depuración
-        if (idx < 3) {
-          console.log(`📍 Node ${idx}:`, {
-            id: node.id,
-            name: node.name,
-            type: node.type,
-            lat,
-            lng,
-            hasCoordinates: !!node.coordinates
-          });
-        }
-
-        // Validar coordenadas antes de crear marcador
         if (!isValidCoordinate(lat, lng)) {
-          console.warn(`❌ Invalid coordinates for node ${node.id}:`, { lat, lng });
           errorCount++;
           return;
         }
 
         const color = node.type === 'origin' ? '#3b82f6' :
-                      node.type === 'destination' ? '#a855f7' :
-                      '#6b7280';
+            node.type === 'destination' ? '#a855f7' :
+                '#6b7280';
 
         try {
-          // Crear contenido del marcador con SVG
           const div = document.createElement('div');
 
           div.innerHTML = `
@@ -263,31 +228,27 @@ export default {
 
           if (AdvancedMarkerElement) {
             marker = new AdvancedMarkerElement({
-              position: { lat, lng },
+              position: {lat, lng},
               map: map,
               title: node.label || node.name,
               content: div
             });
           } else {
-            // Fallback: crear un marcador simple sin AdvancedMarkerElement
-            console.warn('AdvancedMarkerElement not available, using fallback');
             const infoWindow = new google.InfoWindow({
               content: div
             });
 
-            // Crear un marcador invisible como punto de anclaje
             marker = {
-              position: { lat, lng },
+              position: {lat, lng},
               map: map,
               infoWindow: infoWindow,
-              setMap: function(m) {
-                if (m) infoWindow.open(map, { position: this.position });
+              setMap: function (m) {
+                if (m) infoWindow.open(map, {position: this.position});
                 else infoWindow.close();
               }
             };
           }
 
-          // Agregar listener de click
           if (marker && marker.addEventListener) {
             marker.addEventListener('click', () => {
               selectedNode.value = node;
@@ -297,40 +258,21 @@ export default {
           markers.push(marker);
           successCount++;
         } catch (err) {
-          console.error(`❌ Error creating marker for node ${node.id}:`, err);
+          console.error(`Error creating marker for node ${node.id}:`, err);
           errorCount++;
         }
       });
 
-      console.log(`✅ Nodes rendered: ${successCount} success, ${errorCount} errors`);
-    };
 
-    const createMarkerContent = (node, color) => {
-      const div = document.createElement('div');
-      div.style.cssText = `
-        background-color: ${color};
-        color: white;
-        padding: 4px 8px;
-        border-radius: 50%;
-        font-weight: bold;
-        text-align: center;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
-      `;
-      div.textContent = node.id;
-      return div;
     };
 
     const renderEdges = () => {
       if (!map || !google) return;
 
       polylines.forEach(p => {
-        try { p.setMap(null); } catch (e) {
+        try {
+          p.setMap(null);
+        } catch (e) {
           console.warn('Error removing polyline:', e);
         }
       });
@@ -342,7 +284,6 @@ export default {
       });
 
       filteredEdges.forEach(edge => {
-        // Convertir Proxy a objeto plano
         const edgeObj = JSON.parse(JSON.stringify(edge));
         const fromId = edgeObj.source || edgeObj.from;
         const toId = edgeObj.target || edgeObj.to;
@@ -351,7 +292,7 @@ export default {
         const endNode = props.nodes.find(n => n.id === toId);
 
         if (!startNode || !endNode) {
-          console.warn(`Edge nodes not found: from=${fromId}, to=${toId}`, { edgeObj });
+          console.warn(`Edge nodes not found: from=${fromId}, to=${toId}`, {edgeObj});
           return;
         }
 
@@ -360,7 +301,7 @@ export default {
 
         if (!isValidCoordinate(startCoords.lat, startCoords.lng) ||
             !isValidCoordinate(endCoords.lat, endCoords.lng)) {
-          console.warn('Invalid coordinates for edge:', { edge: { from: fromId, to: toId }, startCoords, endCoords });
+          console.warn('Invalid coordinates for edge:', {edge: {from: fromId, to: toId}, startCoords, endCoords});
           return;
         }
 
@@ -384,64 +325,41 @@ export default {
     const renderOptimalRoute = () => {
       if (!map || !google) return;
       if (props.optimalRoute.length === 0) {
-        console.log('No optimal route to render');
         return;
       }
 
-      console.log('Rendering optimal route with edges:', props.optimalRoute.length);
-      console.log('First edge raw:', props.optimalRoute[0]);
-
       const routePath = [];
 
-      props.optimalRoute.forEach((edge, idx) => {
-        // Convertir Proxy a objeto plano
+      props.optimalRoute.forEach((edge) => {
         const edgeObj = JSON.parse(JSON.stringify(edge));
         const fromId = edgeObj.source || edgeObj.from;
-
-        if (idx === 0) {
-          console.log(`Route edge ${idx} parsed:`, { fromId, edgeObj });
-        }
 
         const startNode = props.nodes.find(n => n.id === fromId);
 
         if (startNode) {
           const coords = getCoordinates(startNode);
-          if (idx === 0) {
-            console.log(`Route edge ${idx}: from=${fromId}, coords=`, coords);
-          }
           if (isValidCoordinate(coords.lat, coords.lng)) {
             routePath.push(coords);
           }
-        } else {
-          console.warn(`Start node not found for edge from: ${fromId}`, { edgeObj, availableNodeIds: props.nodes.map(n => n.id) });
         }
       });
 
-      // Agregar el nodo destino de la última arista
       if (props.optimalRoute.length > 0) {
         const lastEdge = props.optimalRoute[props.optimalRoute.length - 1];
         const lastEdgeObj = JSON.parse(JSON.stringify(lastEdge));
         const toId = lastEdgeObj.target || lastEdgeObj.to;
 
-        console.log('Last edge parsed:', { toId, lastEdgeObj });
-
         const endNode = props.nodes.find(n => n.id === toId);
 
         if (endNode) {
           const coords = getCoordinates(endNode);
-          console.log(`Route final: to=${toId}, coords=`, coords);
           if (isValidCoordinate(coords.lat, coords.lng)) {
             routePath.push(coords);
           }
-        } else {
-          console.warn(`End node not found for edge to: ${toId}`, { lastEdgeObj, availableNodeIds: props.nodes.map(n => n.id) });
         }
       }
 
-      console.log('Final route path:', routePath);
-
       if (routePath.length < 2) {
-        console.warn('Insufficient valid coordinates for optimal route. Path length:', routePath.length);
         return;
       }
 
@@ -456,7 +374,6 @@ export default {
         });
 
         polylines.push(optimalPolyline);
-        console.log('Optimal route rendered successfully');
       } catch (err) {
         console.error('Error creating optimal route polyline:', err);
       }
@@ -464,10 +381,9 @@ export default {
 
     onMounted(initMap);
 
-    // Watchers: solo ejecutar si el mapa está listo
     watch(() => props.nodes, () => {
       if (map) renderNodes();
-    }, { deep: true });
+    }, {deep: true});
 
     watch(() => props.transportMode, () => {
       if (map) renderEdges();
@@ -475,14 +391,14 @@ export default {
 
     watch(() => props.optimalRoute, () => {
       if (map) renderOptimalRoute();
-    }, { deep: true });
+    }, {deep: true});
 
     return {
       mapContainer,
       selectedNode
     };
   }
-};
+}
 </script>
 
 <style scoped>

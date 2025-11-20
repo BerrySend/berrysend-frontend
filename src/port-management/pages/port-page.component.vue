@@ -12,8 +12,8 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Gestión de Puertos</h1>
-            <p class="text-sm text-gray-600">Administra puertos, rutas y configuraciones del sistema</p>
+            <h1 class="text-2xl font-bold text-gray-900">Port Management</h1>
+            <p class="text-sm text-gray-600">Manage ports, routes and system configurations</p>
           </div>
         </div>
 
@@ -24,7 +24,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
-          Agregar Puerto
+          Add Port
         </button>
       </div>
     </div>
@@ -39,7 +39,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.totalPorts }}</span>
         </div>
-        <p class="text-sm text-gray-600">Total de Puertos</p>
+        <p class="text-sm text-gray-600">Total Ports</p>
       </div>
 
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
@@ -50,7 +50,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.maritimeRoutes }}</span>
         </div>
-        <p class="text-sm text-gray-600">Rutas Marítimas</p>
+        <p class="text-sm text-gray-600">Maritime Routes</p>
       </div>
 
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
@@ -61,7 +61,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.airRoutes }}</span>
         </div>
-        <p class="text-sm text-gray-600">Rutas Aéreas</p>
+        <p class="text-sm text-gray-600">Air Routes</p>
       </div>
 
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
@@ -72,7 +72,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.averageTime }}</span>
         </div>
-        <p class="text-sm text-gray-600">Tiempo Promedio (días)</p>
+        <p class="text-sm text-gray-600">Average Time (hours)</p>
       </div>
     </div>
 
@@ -89,7 +89,7 @@
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Buscar por nombre o país..."
+              placeholder="Search by name or country..."
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />
         </div>
@@ -256,14 +256,12 @@ export default {
      */
     const openCreateModal = () => {
       // TODO: Implement modal
-      console.log('Open create port modal');
     };
 
     /**
      * Handle edit port action
      */
     const handleEdit = (port) => {
-      console.log('Edit port:', port);
       // TODO: Implement edit modal
     };
 
@@ -287,8 +285,7 @@ export default {
      * Handle view port details action
      */
     const handleViewDetails = (port) => {
-      console.log('View details for port:', port);
-      // TODO: Navigate to port details page
+      // TODO: Show port details modal
     };
 
     // Lifecycle hooks
