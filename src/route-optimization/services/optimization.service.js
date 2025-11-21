@@ -10,7 +10,7 @@ import Algorithm from "@/route-optimization/model/algorithm.entity.js";
 import {PredefinedAlgorithms} from "@/route-optimization/model/algorithm.entity.js";
 import OptimizationConfig from "@/route-optimization/model/optimization-config.entity.js";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 /**
  * Optimization Service class for API interactions
@@ -64,6 +64,41 @@ class OptimizationService {
     }
 
     /**
+     * Computes optimal route with given parameters
+     *
+     * @param {Object} params - Optimization parameters
+     * @param {string} params.source - Source port ID
+     * @param {string} params.destination - Destination port ID
+     * @param {string} params.mode - Transport mode
+     * @param {string} params.algorithm_name - Algorithm name
+     * @param {number} params.export_weight - Export weight in tons
+     * @param {Object} params.parameters - Algorithm specific parameters
+     * @returns {Promise<Object>} Optimization result with optimal path
+     * @throws {Error} If validation fails or API request fails
+     */
+    async computeOptimalRoute(params) {
+        try {
+            const payload = {
+                source: params.source,
+                destination: params.destination,
+                mode: params.mode,
+                algorithm_name: params.algorithm_name,
+                export_weight: params.export_weight,
+                parameters: params.parameters || {}
+            };
+
+            const response = await axios.post(
+                `${API_BASE_URL}/v1/routes/compute`,
+                payload
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error computing optimal route:', error);
+            throw new Error('Failed to compute optimal route');
+        }
+    }
+
+    /**
      * Executes route optimization with given configuration
      *
      * @param {OptimizationConfig} config - Optimization configuration
@@ -79,7 +114,7 @@ class OptimizationService {
 
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/optimization/execute`,
+                `${API_BASE_URL}/optimization/compute`,
                 config.toJSON()
             );
             return response.data;

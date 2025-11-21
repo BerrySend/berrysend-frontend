@@ -85,6 +85,96 @@
       />
     </div>
 
+    <!-- Exports Table -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Exportaciones Registradas
+        </h2>
+        <p class="text-sm text-gray-600 mt-1">{{ exportsList.length }} exportaciones en el sistema</p>
+      </div>
+
+      <div v-if="loadingExports" class="text-center py-8">
+        <div class="inline-block animate-spin">
+          <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </div>
+        <p class="text-gray-600 mt-2">Cargando exportaciones...</p>
+      </div>
+
+      <div v-else-if="exportsList.length > 0" class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">ID</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Descripción Comercial</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Modo Transporte</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">FOB USD</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Peso Bruto</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Peso Neto</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Unidad</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Cantidad</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Estado</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Fecha Creación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="exportItem in exportsList" :key="exportItem.id" class="border-b border-gray-100 hover:bg-gray-50 transition">
+              <td class="py-3 px-4 text-gray-900 font-medium">#{{ exportItem.id }}</td>
+              <td class="py-3 px-4 text-gray-700">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                  {{ exportItem.user_id }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-700 max-w-xs truncate" :title="exportItem.commercial_description">
+                {{ exportItem.commercial_description }}
+              </td>
+              <td class="py-3 px-4 text-gray-700">
+                <span :class="[
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                  exportItem.transportation_mode === 'maritime'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-purple-100 text-purple-800'
+                ]">
+                  {{ exportItem.transportation_mode === 'maritime' ? '🌊 Marítimo' : '✈️ Aéreo' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-700 font-semibold text-green-600">
+                ${{ exportItem.us_fob.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+              </td>
+              <td class="py-3 px-4 text-gray-700">{{ exportItem.gross_weight.toLocaleString() }}</td>
+              <td class="py-3 px-4 text-gray-700">{{ exportItem.net_weight.toLocaleString() }}</td>
+              <td class="py-3 px-4 text-gray-700">{{ exportItem.unit }}</td>
+              <td class="py-3 px-4 text-gray-700 font-medium">{{ exportItem.quantity.toLocaleString() }}</td>
+              <td class="py-3 px-4">
+                <span
+                  :class="[
+                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                    getStatusClass(exportItem.status)
+                  ]"
+                >
+                  {{ getStatusLabel(exportItem.status) }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-600">{{ formatDate(exportItem.created_at) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div v-else class="text-center py-8">
+        <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+        </svg>
+        <p class="text-gray-600">No hay exportaciones para mostrar</p>
+      </div>
+    </div>
+
     <!-- Statistics -->
     <div class="grid grid-cols-4 gap-4">
       <div class="bg-white rounded-xl border border-gray-200 p-5">
@@ -137,6 +227,7 @@ import {graphService} from "@/export-management/services/graph.service.js";
 import GraphEdge from "@/export-management/model/graph-edge.entity.js";
 import GraphNode from "@/export-management/model/graph-node.entity.js";
 import GoogleMapsGraph from "@/export-management/components/google-maps-graph.component.vue";
+import ExportService from "@/export-management/services/export.service.js";
 
 // Icon components
 const EyeIcon = () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
@@ -162,6 +253,8 @@ export default {
     const graphNodes = ref([]);
     const graphEdges = ref([]);
     const optimalRoute = ref([]);
+    const exportsList = ref([]);
+    const loadingExports = ref(false);
 
     const transportModes = [
       { id: 'all', label: 'Etiquetas', icon: EyeIcon, activeClass: 'bg-blue-500 text-white' },
@@ -175,6 +268,38 @@ export default {
       maritimeRoutes: graphEdges.value.filter(e => e.mode === 'maritime').length,
       airRoutes: graphEdges.value.filter(e => e.mode === 'air').length,
     }));
+
+    const getStatusClass = (status) => {
+      const statusClasses = {
+        'completed': 'bg-green-100 text-green-800',
+        'in_transit': 'bg-blue-100 text-blue-800',
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'cancelled': 'bg-red-100 text-red-800'
+      };
+      return statusClasses[status] || 'bg-gray-100 text-gray-800';
+    };
+
+    const getStatusLabel = (status) => {
+      const statusLabels = {
+        'completed': 'Completado',
+        'in_transit': 'En tránsito',
+        'pending': 'Pendiente',
+        'cancelled': 'Cancelado'
+      };
+      return statusLabels[status] || status;
+    };
+
+    const formatDate = (dateString) => {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
 
     const loadGraphData = async () => {
       try {
@@ -226,10 +351,27 @@ export default {
         optimalRoute.value = optimalRouteEdges;
 
       } catch (error) {
+        console.error('Error loading graph data:', error);
       }
     };
 
-    onMounted(loadGraphData);
+    const loadExports = async () => {
+      loadingExports.value = true;
+      try {
+        exportsList.value = await ExportService.getAllExports();
+      } catch (error) {
+        console.error('Error loading exports:', error);
+        // Fallback: mostrar lista vacía en lugar de romper la página
+        exportsList.value = [];
+      } finally {
+        loadingExports.value = false;
+      }
+    };
+
+    onMounted(() => {
+      loadGraphData();
+      loadExports();
+    });
 
     return {
       activeTransportMode,
@@ -237,7 +379,12 @@ export default {
       graphNodes,
       graphEdges,
       optimalRoute,
-      statistics
+      statistics,
+      exportsList,
+      loadingExports,
+      getStatusClass,
+      getStatusLabel,
+      formatDate
     };
   }
 };

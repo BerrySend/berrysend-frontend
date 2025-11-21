@@ -360,5 +360,63 @@
       "createdAt": "2025-11-19T16:47:03.884Z",
       "id": "iHXiLfH"
     }
+  ],
+  "exports": [
+    {
+      "id": 1,
+      "user_id": "1",
+      "commercial_description": "Cobre en barras - Exportación de minerales",
+      "transportation_mode": "maritime",
+      "us_fob": 850000.00,
+      "gross_weight": 45000.00,
+      "net_weight": 43500.00,
+      "unit": "kg",
+      "quantity": 500.00,
+      "route_id": "callao-balboa-shanghai",
+      "status": "completed",
+      "created_at": "2025-11-19T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "user_id": "2",
+      "commercial_description": "Frutas tropicales - Plátanos y piñas frescos",
+      "transportation_mode": "maritime",
+      "us_fob": 125000.50,
+      "gross_weight": 22000.00,
+      "net_weight": 21000.00,
+      "unit": "kg",
+      "quantity": 350.00,
+      "route_id": "balboa-hamburg-rotterdam",
+      "status": "in_transit",
+      "created_at": "2025-11-20T08:00:00Z"
+    },
+    {
+      "id": 3,
+      "user_id": "gxWqxyA",
+      "commercial_description": "Café premium - Granos de café de alta calidad",
+      "transportation_mode": "maritime",
+      "us_fob": 275000.00,
+      "gross_weight": 18000.00,
+      "net_weight": 17200.00,
+      "unit": "kg",
+      "quantity": 860.00,
+      "route_id": "santos-rotterdam-hamburg",
+      "status": "pending",
+      "created_at": "2025-11-20T12:00:00Z"
+    },
+    {
+      "id": 4,
+      "user_id": "iHXiLfH",
+      "commercial_description": "Aceite de pescado - Producto derivado de pescado",
+      "transportation_mode": "maritime",
+      "us_fob": 95000.00,
+      "gross_weight": 8000.00,
+      "net_weight": 7800.00,
+      "unit": "litros",
+      "quantity": 1200.00,
+      "route_id": "callao-balboa-direct",
+      "status": "completed",
+      "created_at": "2025-11-18T14:20:00Z"
+    }
   ]
 }
