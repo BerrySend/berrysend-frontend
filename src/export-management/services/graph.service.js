@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Usar la variable de entorno o un valor por defecto
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 export const graphService = {

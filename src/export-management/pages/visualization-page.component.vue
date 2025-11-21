@@ -124,7 +124,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="exportItem in exportsList" :key="exportItem.id" class="border-b border-gray-100 hover:bg-gray-50 transition">
+            <tr
+              v-for="exportItem in exportsList"
+              :key="exportItem.id"
+              class="border-b border-gray-100 hover:bg-blue-50 transition cursor-pointer"
+              @click="selectExport(exportItem)"
+              :class="{ 'bg-blue-100': selectedExport?.id === exportItem.id }"
+            >
               <td class="py-3 px-4 text-gray-900 font-medium">#{{ exportItem.id }}</td>
               <td class="py-3 px-4 text-gray-700">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
@@ -255,6 +261,7 @@ export default {
     const optimalRoute = ref([]);
     const exportsList = ref([]);
     const loadingExports = ref(false);
+    const selectedExport = ref(null);
 
     const transportModes = [
       { id: 'all', label: 'Etiquetas', icon: EyeIcon, activeClass: 'bg-blue-500 text-white' },
@@ -309,7 +316,6 @@ export default {
           graphService.getOptimalRoute()
         ]);
 
-        // Instantiate as entity classes
         graphNodes.value = nodesRes.data.map(node => new GraphNode(node));
         graphEdges.value = edgesRes.data.map(e => new GraphEdge(e));
 
@@ -361,10 +367,59 @@ export default {
         exportsList.value = await ExportService.getAllExports();
       } catch (error) {
         console.error('Error loading exports:', error);
-        // Fallback: mostrar lista vacía en lugar de romper la página
         exportsList.value = [];
       } finally {
         loadingExports.value = false;
+      }
+    };
+
+    const selectExport = async (exportItem) => {
+      selectedExport.value = exportItem;
+
+      const routeStr = exportItem.route_id;
+      const portIds = routeStr.split('-');
+
+      console.log('📍 Export seleccionado:', exportItem.commercial_description);
+      console.log('🛣️ Route ID:', routeStr);
+      console.log('🚢 Puertos en ruta:', portIds);
+
+      try {
+        const [portsRes, connectionsRes] = await Promise.all([
+          graphService.getNodes(),
+          graphService.getEdges()
+        ]);
+
+        graphNodes.value = portsRes.data.map(node => new GraphNode(node));
+        graphEdges.value = connectionsRes.data.map(edge => new GraphEdge(edge));
+
+        console.log('✅ Total de nodos:', graphNodes.value.length);
+        console.log('✅ Total de aristas:', graphEdges.value.length);
+
+        const optimalRouteEdges = [];
+        for (let i = 0; i < portIds.length - 1; i++) {
+          const fromId = portIds[i];
+          const toId = portIds[i + 1];
+
+          const edge = graphEdges.value.find(e =>
+            (e.source === fromId && e.target === toId) ||
+            (e.source === toId && e.target === fromId) ||
+            (e.port_a_id === fromId && e.port_b_id === toId) ||
+            (e.port_a_id === toId && e.port_b_id === fromId)
+          );
+
+          if (edge) {
+            optimalRouteEdges.push(edge);
+            console.log(`✅ Arista ${i}: ${fromId} → ${toId}`);
+          } else {
+            console.warn(`⚠️ No se encontró arista entre ${fromId} y ${toId}`);
+          }
+        }
+
+        optimalRoute.value = optimalRouteEdges;
+        console.log('🎯 Ruta óptima actualizada con', optimalRouteEdges.length, 'aristas en rojo');
+
+      } catch (error) {
+        console.error('❌ Error al seleccionar exportación:', error);
       }
     };
 
@@ -382,6 +437,8 @@ export default {
       statistics,
       exportsList,
       loadingExports,
+      selectedExport,
+      selectExport,
       getStatusClass,
       getStatusLabel,
       formatDate
