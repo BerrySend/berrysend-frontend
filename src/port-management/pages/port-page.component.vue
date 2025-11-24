@@ -12,20 +12,10 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Port Management</h1>
-            <p class="text-sm text-gray-600">Manage ports, routes and system configurations</p>
+            <h1 class="text-2xl font-bold text-gray-900">Gestión de Puertos</h1>
+            <p class="text-sm text-gray-600">Administra puertos, rutas y configuraciones del sistema</p>
           </div>
         </div>
-
-        <button
-            @click="openCreateModal"
-            class="px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition-colors flex items-center gap-2"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-          </svg>
-          Add Port
-        </button>
       </div>
     </div>
 
@@ -39,7 +29,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.totalPorts }}</span>
         </div>
-        <p class="text-sm text-gray-600">Total Ports</p>
+        <p class="text-sm text-gray-600">Total de Puertos</p>
       </div>
 
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
@@ -50,7 +40,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.maritimeRoutes }}</span>
         </div>
-        <p class="text-sm text-gray-600">Maritime Routes</p>
+        <p class="text-sm text-gray-600">Rutas Marítimas</p>
       </div>
 
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
@@ -61,7 +51,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.airRoutes }}</span>
         </div>
-        <p class="text-sm text-gray-600">Air Routes</p>
+        <p class="text-sm text-gray-600">Rutas Aéreas</p>
       </div>
 
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
@@ -72,7 +62,7 @@
           </svg>
           <span class="text-2xl font-bold text-gray-900">{{ statistics.averageTime }}</span>
         </div>
-        <p class="text-sm text-gray-600">Avg. Time (days)</p>
+        <p class="text-sm text-gray-600">Tiempo Promedio (días)</p>
       </div>
     </div>
 
@@ -89,7 +79,7 @@
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search by name or country..."
+              placeholder="Buscar por nombre o país..."
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />
         </div>
@@ -119,13 +109,13 @@
                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        System Ports
+        Puertos del Sistema
       </h2>
 
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-        <p class="mt-4 text-gray-600">Loading ports...</p>
+        <p class="mt-4 text-gray-600">Cargando puertos...</p>
       </div>
 
       <!-- Error State -->
@@ -134,13 +124,13 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <p class="text-gray-900 font-medium mb-2">Error loading ports</p>
+        <p class="text-gray-900 font-medium mb-2">Error al cargar los puertos</p>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button
             @click="fetchPorts"
             class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
         >
-          Try Again
+          Intentar de nuevo
         </button>
       </div>
 
@@ -151,7 +141,6 @@
             :key="port.id"
             :port="port"
             @edit="handleEdit"
-            @delete="handleDelete"
             @view-details="handleViewDetails"
         />
       </div>
@@ -162,11 +151,12 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
         </svg>
-        <p class="text-gray-600">No ports found</p>
+        <p class="text-gray-600">No se encontraron puertos</p>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, computed, onMounted } from 'vue';
@@ -251,35 +241,11 @@ export default {
     };
 
     /**
-     * Open modal to create new port
-     */
-    const openCreateModal = () => {
-      // TODO: Implement modal
-      console.log('Open create port modal');
-    };
-
-    /**
      * Handle edit port action
      */
     const handleEdit = (port) => {
       console.log('Edit port:', port);
       // TODO: Implement edit modal
-    };
-
-    /**
-     * Handle delete port action
-     */
-    const handleDelete = async (port) => {
-      if (!confirm(`Are you sure you want to delete ${port.name}?`)) {
-        return;
-      }
-
-      try {
-        await portService.deletePort(port.id);
-        await fetchPorts();
-      } catch (err) {
-        alert(`Failed to delete port: ${err.message}`);
-      }
     };
 
     /**
@@ -305,9 +271,7 @@ export default {
       filters,
       filteredPorts,
       fetchPorts,
-      openCreateModal,
       handleEdit,
-      handleDelete,
       handleViewDetails
     };
   }

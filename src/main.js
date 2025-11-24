@@ -6,9 +6,21 @@
  */
 
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
+import { setupAxiosInterceptor } from './shared/interceptors/axios.interceptor.js';
+import { useAuthStore } from './shared/stores/auth.store.js';
 import './assets/tailwind.css';
+import { validateEnvironment, getAppName, config } from '@/config/environment.js';
+
+// Validate environment variables on startup
+validateEnvironment();
+
+/**
+ * Create Pinia instance
+ */
+const pinia = createPinia();
 
 /**
  * Create Vue application instance
@@ -40,8 +52,10 @@ if (import.meta.env.DEV) {
  * Global properties
  * Available in all components via this.$appName, etc.
  */
-app.config.globalProperties.$appName = 'BerrySend';
-app.config.globalProperties.$version = '1.0.0';
+app.config.globalProperties.$appName = getAppName();
+app.config.globalProperties.$version = config.appVersion;
+app.config.globalProperties.$apiBaseUrl = config.apiBaseUrl;
+app.config.globalProperties.$config = config;
 
 /**
  * Register global components
@@ -52,7 +66,19 @@ app.config.globalProperties.$version = '1.0.0';
 /**
  * Install plugins
  */
+app.use(pinia);
 app.use(router);
+
+/**
+ * Setup axios interceptor for authentication
+ */
+setupAxiosInterceptor();
+
+/**
+ * Initialize auth store from localStorage
+ */
+const authStore = useAuthStore();
+authStore.initialize();
 
 /**
  * Mount application to DOM

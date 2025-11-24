@@ -1,0 +1,444 @@
+{
+  "port-connections": [
+    {
+      "port_a_id": "callao",
+      "port_a_name": "Callao",
+      "port_b_id": "balboa",
+      "port_b_name": "Balboa",
+      "distance_km": 2800,
+      "time_hours": 4,
+      "cost_usd": 45000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "callao",
+      "port_a_name": "Callao",
+      "port_b_id": "losangeles",
+      "port_b_name": "Los Angeles",
+      "distance_km": 6500,
+      "time_hours": 14,
+      "cost_usd": 85000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "callao",
+      "port_a_name": "Callao",
+      "port_b_id": "santos",
+      "port_b_name": "Santos",
+      "distance_km": 5200,
+      "time_hours": 12,
+      "cost_usd": 65000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "balboa",
+      "port_a_name": "Balboa",
+      "port_b_id": "miami",
+      "port_b_name": "Miami",
+      "distance_km": 3200,
+      "time_hours": 7,
+      "cost_usd": 50000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "balboa",
+      "port_a_name": "Balboa",
+      "port_b_id": "rotterdam",
+      "port_b_name": "Rotterdam",
+      "distance_km": 9600,
+      "time_hours": 20,
+      "cost_usd": 120000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "balboa",
+      "port_a_name": "Balboa",
+      "port_b_id": "shanghai",
+      "port_b_name": "Shanghai",
+      "distance_km": 18000,
+      "time_hours": 32,
+      "cost_usd": 180000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "losangeles",
+      "port_a_name": "Los Angeles",
+      "port_b_id": "shanghai",
+      "port_b_name": "Shanghai",
+      "distance_km": 11000,
+      "time_hours": 18,
+      "cost_usd": 110000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "losangeles",
+      "port_a_name": "Los Angeles",
+      "port_b_id": "tokyo",
+      "port_b_name": "Tokyo",
+      "distance_km": 9000,
+      "time_hours": 14,
+      "cost_usd": 95000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "losangeles",
+      "port_a_name": "Los Angeles",
+      "port_b_id": "miami",
+      "port_b_name": "Miami",
+      "distance_km": 3500,
+      "time_hours": 1,
+      "cost_usd": 85000,
+      "route_type": "air",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "miami",
+      "port_a_name": "Miami",
+      "port_b_id": "nuevayork",
+      "port_b_name": "Nueva York",
+      "distance_km": 2000,
+      "time_hours": 3,
+      "cost_usd": 35000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "miami",
+      "port_a_name": "Miami",
+      "port_b_id": "rotterdam",
+      "port_b_name": "Rotterdam",
+      "distance_km": 7800,
+      "time_hours": 15,
+      "cost_usd": 95000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "nuevayork",
+      "port_a_name": "Nueva York",
+      "port_b_id": "rotterdam",
+      "port_b_name": "Rotterdam",
+      "distance_km": 6000,
+      "time_hours": 13,
+      "cost_usd": 80000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "nuevayork",
+      "port_a_name": "Nueva York",
+      "port_b_id": "hamburgo",
+      "port_b_name": "Hamburgo",
+      "distance_km": 6500,
+      "time_hours": 14,
+      "cost_usd": 85000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "rotterdam",
+      "port_a_name": "Rotterdam",
+      "port_b_id": "shanghai",
+      "port_b_name": "Shanghai",
+      "distance_km": 19000,
+      "time_hours": 32,
+      "cost_usd": 150000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "rotterdam",
+      "port_a_name": "Rotterdam",
+      "port_b_id": "hamburgo",
+      "port_b_name": "Hamburgo",
+      "distance_km": 600,
+      "time_hours": 1,
+      "cost_usd": 10000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "hamburgo",
+      "port_a_name": "Hamburgo",
+      "port_b_id": "shanghai",
+      "port_b_name": "Shanghai",
+      "distance_km": 18500,
+      "time_hours": 30,
+      "cost_usd": 145000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "santos",
+      "port_a_name": "Santos",
+      "port_b_id": "rotterdam",
+      "port_b_name": "Rotterdam",
+      "distance_km": 10500,
+      "time_hours": 22,
+      "cost_usd": 125000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "santos",
+      "port_a_name": "Santos",
+      "port_b_id": "shanghai",
+      "port_b_name": "Shanghai",
+      "distance_km": 20000,
+      "time_hours": 35,
+      "cost_usd": 190000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "balboa",
+      "port_a_name": "Balboa",
+      "port_b_id": "hamburgo",
+      "port_b_name": "Hamburgo",
+      "distance_km": 11000,
+      "time_hours": 22,
+      "cost_usd": 135000,
+      "route_type": "maritime",
+      "is_restricted": false
+    },
+    {
+      "port_a_id": "rotterdam",
+      "port_a_name": "Rotterdam",
+      "port_b_id": "balboa",
+      "port_b_name": "Balboa",
+      "distance_km": 9600,
+      "time_hours": 20,
+      "cost_usd": 120000,
+      "route_type": "maritime",
+      "is_restricted": false
+    }
+  ],
+  "optimalRoute": [
+    "callao",
+    "balboa",
+    "rotterdam",
+    "shanghai"
+  ],
+  "ports": [
+    {
+      "id": "callao",
+      "name": "Callao",
+      "country": "Perú",
+      "type": "origin",
+      "capacity": 3500000,
+      "connections": 5,
+      "coordinates": {
+        "latitude": -12.05,
+        "longitude": -77.14
+      }
+    },
+    {
+      "id": "balboa",
+      "name": "Balboa",
+      "country": "Panamá",
+      "type": "intermediate",
+      "capacity": 2500000,
+      "connections": 4,
+      "coordinates": {
+        "latitude": 8.95,
+        "longitude": -79.55
+      }
+    },
+    {
+      "id": "santos",
+      "name": "Santos",
+      "country": "Brasil",
+      "type": "intermediate",
+      "capacity": 3000000,
+      "connections": 3,
+      "coordinates": {
+        "latitude": -23.96,
+        "longitude": -46.33
+      }
+    },
+    {
+      "id": "losangeles",
+      "name": "Los Angeles",
+      "country": "Estados Unidos",
+      "type": "intermediate",
+      "capacity": 5000000,
+      "connections": 6,
+      "coordinates": {
+        "latitude": 33.74,
+        "longitude": -118.27
+      }
+    },
+    {
+      "id": "miami",
+      "name": "Miami",
+      "country": "Estados Unidos",
+      "type": "intermediate",
+      "capacity": 1800000,
+      "connections": 4,
+      "coordinates": {
+        "latitude": 25.77,
+        "longitude": -80.19
+      }
+    },
+    {
+      "id": "rotterdam",
+      "name": "Rotterdam",
+      "country": "Países Bajos",
+      "type": "intermediate",
+      "capacity": 6000000,
+      "connections": 8,
+      "coordinates": {
+        "latitude": 51.92,
+        "longitude": 4.48
+      }
+    },
+    {
+      "id": "shanghai",
+      "name": "Shanghai",
+      "country": "China",
+      "type": "destination",
+      "capacity": 7000000,
+      "connections": 10,
+      "coordinates": {
+        "latitude": 31.23,
+        "longitude": 121.47
+      }
+    },
+    {
+      "id": "nuevayork",
+      "name": "Nueva York",
+      "country": "Estados Unidos",
+      "type": "intermediate",
+      "capacity": 4500000,
+      "connections": 7,
+      "coordinates": {
+        "latitude": 40.71,
+        "longitude": -74.01
+      }
+    },
+    {
+      "id": "hamburgo",
+      "name": "Hamburgo",
+      "country": "Alemania",
+      "type": "intermediate",
+      "capacity": 5500000,
+      "connections": 7,
+      "coordinates": {
+        "latitude": 53.55,
+        "longitude": 9.99
+      }
+    },
+    {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "country": "Japón",
+      "type": "destination",
+      "capacity": 6000000,
+      "connections": 9,
+      "coordinates": {
+        "latitude": 35.65,
+        "longitude": 139.84
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@berrysend.com",
+      "password": "admin123",
+      "name": "Admin User",
+      "role": "admin",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "email": "user@berrysend.com",
+      "password": "user123",
+      "name": "Test User",
+      "role": "user",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "email": "martingonzales42615@gmail.com",
+      "password": "12345678",
+      "name": "Angel Martin Gonzales Castillo",
+      "role": "user",
+      "createdAt": "2025-11-19T14:47:18.931Z",
+      "id": "gxWqxyA"
+    },
+    {
+      "email": "prueba@gmail.com",
+      "password": "123456789",
+      "name": "Prueba1",
+      "role": "user",
+      "createdAt": "2025-11-19T16:47:03.884Z",
+      "id": "iHXiLfH"
+    }
+  ],
+  "exports": [
+    {
+      "id": 1,
+      "user_id": "1",
+      "commercial_description": "Cobre en barras - Exportación de minerales",
+      "transportation_mode": "maritime",
+      "us_fob": 850000.00,
+      "gross_weight": 45000.00,
+      "net_weight": 43500.00,
+      "unit": "kg",
+      "quantity": 500.00,
+      "route_id": "callao-balboa-shanghai",
+      "status": "completed",
+      "created_at": "2025-11-19T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "user_id": "2",
+      "commercial_description": "Frutas tropicales - Plátanos y piñas frescos",
+      "transportation_mode": "maritime",
+      "us_fob": 125000.50,
+      "gross_weight": 22000.00,
+      "net_weight": 21000.00,
+      "unit": "kg",
+      "quantity": 350.00,
+      "route_id": "balboa-rotterdam-hamburgo",
+      "status": "in_transit",
+      "created_at": "2025-11-20T08:00:00Z"
+    },
+    {
+      "id": 3,
+      "user_id": "gxWqxyA",
+      "commercial_description": "Café premium - Granos de café de alta calidad",
+      "transportation_mode": "maritime",
+      "us_fob": 275000.00,
+      "gross_weight": 18000.00,
+      "net_weight": 17200.00,
+      "unit": "kg",
+      "quantity": 860.00,
+      "route_id": "santos-rotterdam-hamburgo",
+      "status": "pending",
+      "created_at": "2025-11-20T12:00:00Z"
+    },
+    {
+      "id": 4,
+      "user_id": "iHXiLfH",
+      "commercial_description": "Aceite de pescado - Producto derivado de pescado",
+      "transportation_mode": "maritime",
+      "us_fob": 95000.00,
+      "gross_weight": 8000.00,
+      "net_weight": 7800.00,
+      "unit": "litros",
+      "quantity": 1200.00,
+      "route_id": "callao-balboa-shanghai",
+      "status": "completed",
+      "created_at": "2025-11-18T14:20:00Z"
+    }
+  ]
+}

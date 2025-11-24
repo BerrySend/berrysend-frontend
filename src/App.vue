@@ -1,10 +1,16 @@
 <template>
   <div id="app">
-    <MainLayoutComponent />
+    <!-- Auth Pages (Login/Register) - No layout wrapper -->
+    <router-view v-if="isAuthPage" />
+
+    <!-- Protected Pages - Main Layout -->
+    <MainLayoutComponent v-else />
   </div>
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import MainLayoutComponent from "@/shared/components/main-layout.component.vue";
 
 /**
@@ -18,6 +24,21 @@ export default {
 
   components: {
     MainLayoutComponent
+  },
+
+  setup() {
+    const route = useRoute();
+
+    /**
+     * Checks if current route is an authentication page
+     */
+    const isAuthPage = computed(() => {
+      return route.path === '/login' || route.path === '/register';
+    });
+
+    return {
+      isAuthPage
+    };
   }
 };
 </script>
