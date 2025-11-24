@@ -71,6 +71,33 @@ export class GraphNode {
     }
 
     /**
+     * Gets latitude (alias for coordinates.latitude)
+     *
+     * @returns {number}
+     */
+    get lat() {
+        return this.coordinates?.latitude || 0;
+    }
+
+    /**
+     * Gets longitude (alias for coordinates.longitude)
+     *
+     * @returns {number}
+     */
+    get lng() {
+        return this.coordinates?.longitude || 0;
+    }
+
+    /**
+     * Gets label (alias for name)
+     *
+     * @returns {string}
+     */
+    get label() {
+        return this.name || `Node ${this.id}`;
+    }
+
+    /**
      * Converts to plain object
      *
      * @returns {Object}

@@ -364,11 +364,9 @@ export default {
 
       isOptimizing.value = true;
       try {
-        const result = await optimizationService.executeOptimization(config.value);
-        console.log('Optimization result:', result);
+        await optimizationService.executeOptimization(config.value);
 
-        // TODO: Navigate to results page or show results modal
-        alert('Optimización completada exitosamente!');
+        alert('Optimization completed successfully!');
       } catch (error) {
         console.error('Error executing optimization:', error);
         alert(`Error: ${error.message}`);

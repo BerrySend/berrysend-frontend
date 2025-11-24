@@ -76,14 +76,109 @@
 
     <!-- Graph Visualization -->
     <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-      <NetworkGraph
+      <GoogleMapsGraph
           :nodes="graphNodes"
           :edges="graphEdges"
           :optimal-route="optimalRoute"
           :transport-mode="activeTransportMode"
           :width="900"
-          :height="500"
       />
+    </div>
+
+    <!-- Exports Table -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Exportaciones Registradas
+        </h2>
+        <p class="text-sm text-gray-600 mt-1">{{ exportsList.length }} exportaciones en el sistema</p>
+      </div>
+
+      <div v-if="loadingExports" class="text-center py-8">
+        <div class="inline-block animate-spin">
+          <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </div>
+        <p class="text-gray-600 mt-2">Cargando exportaciones...</p>
+      </div>
+
+      <div v-else-if="exportsList.length > 0" class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">ID</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Descripción Comercial</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Modo Transporte</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">FOB USD</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Peso Bruto</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Peso Neto</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Unidad</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Cantidad</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Estado</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Fecha Creación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="exportItem in exportsList"
+              :key="exportItem.id"
+              class="border-b border-gray-100 hover:bg-blue-50 transition cursor-pointer"
+              @click="selectExport(exportItem)"
+              :class="{ 'bg-blue-100': selectedExport?.id === exportItem.id }"
+            >
+              <td class="py-3 px-4 text-gray-900 font-medium">#{{ exportItem.id }}</td>
+              <td class="py-3 px-4 text-gray-700">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                  {{ exportItem.user_id }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-700 max-w-xs truncate" :title="exportItem.commercial_description">
+                {{ exportItem.commercial_description }}
+              </td>
+              <td class="py-3 px-4 text-gray-700">
+                <span :class="[
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                  exportItem.transportation_mode === 'maritime'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-purple-100 text-purple-800'
+                ]">
+                  {{ exportItem.transportation_mode === 'maritime' ? '🌊 Marítimo' : '✈️ Aéreo' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-700 font-semibold text-green-600">
+                ${{ exportItem.us_fob.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+              </td>
+              <td class="py-3 px-4 text-gray-700">{{ exportItem.gross_weight.toLocaleString() }}</td>
+              <td class="py-3 px-4 text-gray-700">{{ exportItem.net_weight.toLocaleString() }}</td>
+              <td class="py-3 px-4 text-gray-700">{{ exportItem.unit }}</td>
+              <td class="py-3 px-4 text-gray-700 font-medium">{{ exportItem.quantity.toLocaleString() }}</td>
+              <td class="py-3 px-4">
+                <span
+                  :class="[
+                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                    getStatusClass(exportItem.status)
+                  ]"
+                >
+                  {{ getStatusLabel(exportItem.status) }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-600">{{ formatDate(exportItem.created_at) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div v-else class="text-center py-8">
+        <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+        </svg>
+        <p class="text-gray-600">No hay exportaciones para mostrar</p>
+      </div>
     </div>
 
     <!-- Statistics -->
@@ -137,6 +232,8 @@ import NetworkGraph from '../components/network-graph.component.vue';
 import {graphService} from "@/export-management/services/graph.service.js";
 import GraphEdge from "@/export-management/model/graph-edge.entity.js";
 import GraphNode from "@/export-management/model/graph-node.entity.js";
+import GoogleMapsGraph from "@/export-management/components/google-maps-graph.component.vue";
+import ExportService from "@/export-management/services/export.service.js";
 
 // Icon components
 const EyeIcon = () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
@@ -155,13 +252,16 @@ const PlaneIcon = () => h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewB
 export default {
   name: 'VisualizationPage',
 
-  components: { NetworkGraph },
+  components: {GoogleMapsGraph, NetworkGraph },
 
   setup() {
     const activeTransportMode = ref('all');
     const graphNodes = ref([]);
     const graphEdges = ref([]);
     const optimalRoute = ref([]);
+    const exportsList = ref([]);
+    const loadingExports = ref(false);
+    const selectedExport = ref(null);
 
     const transportModes = [
       { id: 'all', label: 'Etiquetas', icon: EyeIcon, activeClass: 'bg-blue-500 text-white' },
@@ -176,6 +276,38 @@ export default {
       airRoutes: graphEdges.value.filter(e => e.mode === 'air').length,
     }));
 
+    const getStatusClass = (status) => {
+      const statusClasses = {
+        'completed': 'bg-green-100 text-green-800',
+        'in_transit': 'bg-blue-100 text-blue-800',
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'cancelled': 'bg-red-100 text-red-800'
+      };
+      return statusClasses[status] || 'bg-gray-100 text-gray-800';
+    };
+
+    const getStatusLabel = (status) => {
+      const statusLabels = {
+        'completed': 'Completado',
+        'in_transit': 'En tránsito',
+        'pending': 'Pendiente',
+        'cancelled': 'Cancelado'
+      };
+      return statusLabels[status] || status;
+    };
+
+    const formatDate = (dateString) => {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
     const loadGraphData = async () => {
       try {
         const [nodesRes, edgesRes, optimalRes] = await Promise.all([
@@ -184,20 +316,117 @@ export default {
           graphService.getOptimalRoute()
         ]);
 
-        // Instantiate as entity classes
         graphNodes.value = nodesRes.data.map(node => new GraphNode(node));
-        graphEdges.value = edgesRes.data.map(edge => new GraphEdge(edge));
-        optimalRoute.value = optimalRes.data.map(edge => new GraphEdge(edge));
+        graphEdges.value = edgesRes.data.map(e => new GraphEdge(e));
 
-        console.log('Nodos recibidos:', graphNodes.value);
-        console.log('Aristas recibidas:', graphEdges.value);
-        console.log('Ruta óptima:', optimalRoute.value);
+        const routeNodeIds = optimalRes.data;
+        const optimalRouteEdges = [];
+
+        if (Array.isArray(routeNodeIds) && routeNodeIds.length > 0) {
+          if (typeof routeNodeIds[0] === 'string') {
+            for (let i = 0; i < routeNodeIds.length - 1; i++) {
+              const fromId = routeNodeIds[i];
+              const toId = routeNodeIds[i + 1];
+
+              const edge = graphEdges.value.find(e =>
+                (e.source === fromId && e.target === toId) ||
+                (e.source === toId && e.target === fromId) ||
+                (e.port_a_id === fromId && e.port_b_id === toId) ||
+                (e.port_a_id === toId && e.port_b_id === fromId)
+              );
+
+              if (edge) {
+                optimalRouteEdges.push(edge);
+              } else {
+                optimalRouteEdges.push(new GraphEdge({
+                  source: fromId,
+                  target: toId,
+                  mode: 'maritime',
+                  distance: 0,
+                  time: 0,
+                  cost: 0,
+                  isOptimal: true
+                }));
+              }
+            }
+          } else {
+            optimalRouteEdges.push(...routeNodeIds.map(edge => new GraphEdge(edge)));
+          }
+        }
+
+        optimalRoute.value = optimalRouteEdges;
+
       } catch (error) {
         console.error('Error loading graph data:', error);
       }
     };
 
-    onMounted(loadGraphData);
+    const loadExports = async () => {
+      loadingExports.value = true;
+      try {
+        exportsList.value = await ExportService.getAllExports();
+      } catch (error) {
+        console.error('Error loading exports:', error);
+        exportsList.value = [];
+      } finally {
+        loadingExports.value = false;
+      }
+    };
+
+    const selectExport = async (exportItem) => {
+      selectedExport.value = exportItem;
+
+      const routeStr = exportItem.route_id;
+      const portIds = routeStr.split('-');
+
+      console.log('📍 Export seleccionado:', exportItem.commercial_description);
+      console.log('🛣️ Route ID:', routeStr);
+      console.log('🚢 Puertos en ruta:', portIds);
+
+      try {
+        const [portsRes, connectionsRes] = await Promise.all([
+          graphService.getNodes(),
+          graphService.getEdges()
+        ]);
+
+        graphNodes.value = portsRes.data.map(node => new GraphNode(node));
+        graphEdges.value = connectionsRes.data.map(edge => new GraphEdge(edge));
+
+        console.log('✅ Total de nodos:', graphNodes.value.length);
+        console.log('✅ Total de aristas:', graphEdges.value.length);
+
+        const optimalRouteEdges = [];
+        for (let i = 0; i < portIds.length - 1; i++) {
+          const fromId = portIds[i];
+          const toId = portIds[i + 1];
+
+          const edge = graphEdges.value.find(e =>
+            (e.source === fromId && e.target === toId) ||
+            (e.source === toId && e.target === fromId) ||
+            (e.port_a_id === fromId && e.port_b_id === toId) ||
+            (e.port_a_id === toId && e.port_b_id === fromId)
+          );
+
+          if (edge) {
+            optimalRouteEdges.push(edge);
+            console.log(`✅ Arista ${i}: ${fromId} → ${toId}`);
+          } else {
+            console.warn(`⚠️ No se encontró arista entre ${fromId} y ${toId}`);
+          }
+        }
+
+        optimalRoute.value = optimalRouteEdges;
+        console.log('🎯 Ruta óptima actualizada con', optimalRouteEdges.length, 'aristas en rojo');
+
+      } catch (error) {
+        console.error('❌ Error al seleccionar exportación:', error);
+      }
+    };
+
+    onMounted(() => {
+      loadGraphData();
+      loadExports();
+    });
 
     return {
       activeTransportMode,
@@ -205,7 +434,14 @@ export default {
       graphNodes,
       graphEdges,
       optimalRoute,
-      statistics
+      statistics,
+      exportsList,
+      loadingExports,
+      selectedExport,
+      selectExport,
+      getStatusClass,
+      getStatusLabel,
+      formatDate
     };
   }
 };
