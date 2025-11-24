@@ -12,7 +12,10 @@ import router from './router';
 import { setupAxiosInterceptor } from './shared/interceptors/axios.interceptor.js';
 import { useAuthStore } from './shared/stores/auth.store.js';
 import './assets/tailwind.css';
-import {getAppName} from "@/config/environment.js";
+import { validateEnvironment, getAppName, config } from '@/config/environment.js';
+
+// Validate environment variables on startup
+validateEnvironment();
 
 /**
  * Create Pinia instance

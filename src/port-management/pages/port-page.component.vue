@@ -16,16 +16,6 @@
             <p class="text-sm text-gray-600">Administra puertos, rutas y configuraciones del sistema</p>
           </div>
         </div>
-
-        <button
-            @click="openCreateModal"
-            class="px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition-colors flex items-center gap-2"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-          </svg>
-          Agregar Puerto
-        </button>
       </div>
     </div>
 
@@ -151,7 +141,6 @@
             :key="port.id"
             :port="port"
             @edit="handleEdit"
-            @delete="handleDelete"
             @view-details="handleViewDetails"
         />
       </div>
@@ -252,34 +241,11 @@ export default {
     };
 
     /**
-     * Open modal to create new port
-     */
-    const openCreateModal = () => {
-      // TODO: Implement modal
-    };
-
-    /**
      * Handle edit port action
      */
     const handleEdit = (port) => {
       console.log('Edit port:', port);
       // TODO: Implement edit modal
-    };
-
-    /**
-     * Handle delete port action
-     */
-    const handleDelete = async (port) => {
-      if (!confirm(`Are you sure you want to delete ${port.name}?`)) {
-        return;
-      }
-
-      try {
-        await portService.deletePort(port.id);
-        await fetchPorts();
-      } catch (err) {
-        alert(`Failed to delete port: ${err.message}`);
-      }
     };
 
     /**
@@ -305,9 +271,7 @@ export default {
       filters,
       filteredPorts,
       fetchPorts,
-      openCreateModal,
       handleEdit,
-      handleDelete,
       handleViewDetails
     };
   }
