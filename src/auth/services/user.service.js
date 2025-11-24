@@ -7,9 +7,7 @@
 
 import axios from 'axios';
 import {User} from "@/auth/model/user.entity.js";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-const USER_ENDPOINT_PATH = import.meta.env.VITE_USER_ENDPOINT_PATH || '/users';
+import { buildApiUrl, getApiTimeout } from '@/config/environment.js';
 
 /**
  * User Service class for user CRUD operations
@@ -24,8 +22,9 @@ class UserService {
      */
     async findByEmail(email) {
         try {
-            const response = await axios.get(`${API_BASE_URL}${USER_ENDPOINT_PATH}`, {
-                params: { email }
+            const response = await axios.get(buildApiUrl('users'), {
+                params: { email },
+                timeout: getApiTimeout()
             });
 
             const users = response.data;
@@ -50,8 +49,9 @@ class UserService {
      */
     async findByEmailAndPassword(email, password) {
         try {
-            const response = await axios.get(`${API_BASE_URL}${USER_ENDPOINT_PATH}`, {
-                params: { email, password }
+            const response = await axios.get(buildApiUrl('users'), {
+                params: { email, password },
+                timeout: getApiTimeout()
             });
 
             const users = response.data;
@@ -75,7 +75,9 @@ class UserService {
      */
     async getById(id) {
         try {
-            const response = await axios.get(`${API_BASE_URL}${USER_ENDPOINT_PATH}/${id}`);
+            const response = await axios.get(`${buildApiUrl('users')}/${id}`, {
+                timeout: getApiTimeout()
+            });
             return User.fromAPI(response.data);
         } catch (error) {
             console.error('Error getting user by ID:', error);
@@ -114,7 +116,9 @@ class UserService {
                 createdAt: new Date().toISOString()
             };
 
-            const response = await axios.post(`${API_BASE_URL}${USER_ENDPOINT_PATH}`, newUserData);
+            const response = await axios.post(buildApiUrl('users'), newUserData, {
+                timeout: getApiTimeout()
+            });
             return User.fromAPI(response.data);
         } catch (error) {
             console.error('Error creating user:', error);
@@ -136,7 +140,9 @@ class UserService {
      */
     async update(id, userData) {
         try {
-            const response = await axios.put(`${API_BASE_URL}${USER_ENDPOINT_PATH}/${id}`, userData);
+            const response = await axios.put(`${buildApiUrl('users')}/${id}`, userData, {
+                timeout: getApiTimeout()
+            });
             return User.fromAPI(response.data);
         } catch (error) {
             console.error('Error updating user:', error);
@@ -157,7 +163,9 @@ class UserService {
      */
     async delete(id) {
         try {
-            await axios.delete(`${API_BASE_URL}${USER_ENDPOINT_PATH}/${id}`);
+            await axios.delete(`${buildApiUrl('users')}/${id}`, {
+                timeout: getApiTimeout()
+            });
         } catch (error) {
             console.error('Error deleting user:', error);
             
@@ -176,7 +184,9 @@ class UserService {
      */
     async getAll() {
         try {
-            const response = await axios.get(`${API_BASE_URL}${USER_ENDPOINT_PATH}`);
+            const response = await axios.get(buildApiUrl('users'), {
+                timeout: getApiTimeout()
+            });
             return User.fromAPIArray(response.data);
         } catch (error) {
             console.error('Error getting all users:', error);

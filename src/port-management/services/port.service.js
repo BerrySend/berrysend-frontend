@@ -7,8 +7,7 @@
 
 import axios from 'axios';
 import Port from "@/port-management/model/port.entity.js";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+import { buildApiUrl, getApiTimeout } from '@/config/environment.js';
 
 /**
  * Port Service class for API interactions
@@ -27,7 +26,10 @@ class PortService {
     async getAllPorts(filters = {}) {
         try {
             const params = new URLSearchParams(filters);
-            const response = await axios.get(`${API_BASE_URL}/ports`, { params });
+            const response = await axios.get(buildApiUrl('ports'), {
+                params,
+                timeout: getApiTimeout()
+            });
             return Port.fromAPIArray(response.data);
         } catch (error) {
             console.error('Error fetching ports:', error);
@@ -43,7 +45,9 @@ class PortService {
      */
     async getPortById(portId) {
         try {
-            const response = await axios.get(`${API_BASE_URL}/ports/${portId}`);
+            const response = await axios.get(`${buildApiUrl('ports')}/${portId}`, {
+                timeout: getApiTimeout()
+            });
             return Port.fromAPI(response.data);
         } catch (error) {
             console.error(`Error fetching port ${portId}:`, error);

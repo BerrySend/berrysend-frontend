@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+import { buildApiUrl, getApiTimeout } from '@/config/environment.js';
 
 /**
  * Export Service
@@ -15,7 +14,9 @@ class ExportService {
      */
     async getAllExports() {
         try {
-            const response = await axios.get(`${API_BASE_URL}/exports`);
+            const response = await axios.get(buildApiUrl('exports'), {
+                timeout: getApiTimeout()
+            });
             return response.data;
         } catch (error) {
             console.error('Error fetching exports:', error);
@@ -32,7 +33,9 @@ class ExportService {
      */
     async getExportById(exportId) {
         try {
-            const response = await axios.get(`${API_BASE_URL}/exports/${exportId}`);
+            const response = await axios.get(`${buildApiUrl('exports')}/${exportId}`, {
+                timeout: getApiTimeout()
+            });
             return response.data;
         } catch (error) {
             console.error(`Error fetching export ${exportId}:`, error);
@@ -49,7 +52,9 @@ class ExportService {
      */
     async getExportRoute(exportId) {
         try {
-            const response = await axios.get(`${API_BASE_URL}/exports/${exportId}/route`);
+            const response = await axios.get(`${buildApiUrl('exports')}/${exportId}/route`, {
+                timeout: getApiTimeout()
+            });
             return response.data;
         } catch (error) {
             console.error(`Error fetching route for export ${exportId}:`, error);
@@ -66,7 +71,9 @@ class ExportService {
      */
     async getRouteById(routeId) {
         try {
-            const response = await axios.get(`${API_BASE_URL}/routes/${routeId}`);
+            const response = await axios.get(`${buildApiUrl('routes')}/${routeId}`, {
+                timeout: getApiTimeout()
+            });
             return response.data;
         } catch (error) {
             console.error(`Error fetching route ${routeId}:`, error);
@@ -84,7 +91,9 @@ class ExportService {
      */
     async createExport(exportData) {
         try {
-            const response = await axios.post(`${API_BASE_URL}/exports`, exportData);
+            const response = await axios.post(buildApiUrl('exports'), exportData, {
+                timeout: getApiTimeout()
+            });
             return response.data;
         } catch (error) {
             console.error('Error creating export:', error);
@@ -110,7 +119,9 @@ class ExportService {
                 destination_port_name: destinationPortName
             };
 
-            const response = await axios.post(`${API_BASE_URL}/exports`, exportData);
+            const response = await axios.post(buildApiUrl('exports'), exportData, {
+                timeout: getApiTimeout()
+            });
             return response.data;
         } catch (error) {
             console.error('Error creating export from route:', error);
@@ -130,8 +141,9 @@ class ExportService {
     async changeExportRoute(exportId, routeId) {
         try {
             const response = await axios.put(
-                `${API_BASE_URL}/exports/${exportId}`,
-                { route_id: routeId }
+                `${buildApiUrl('exports')}/${exportId}`,
+                { route_id: routeId },
+                { timeout: getApiTimeout() }
             );
             return response.data;
         } catch (error) {

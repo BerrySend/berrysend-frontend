@@ -9,8 +9,7 @@ import axios from 'axios';
 import Algorithm from "@/route-optimization/model/algorithm.entity.js";
 import {PredefinedAlgorithms} from "@/route-optimization/model/algorithm.entity.js";
 import OptimizationConfig from "@/route-optimization/model/optimization-config.entity.js";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+import { buildApiUrl, getApiTimeout } from '@/config/environment.js';
 
 /**
  * Optimization Service class for API interactions
@@ -24,7 +23,9 @@ class OptimizationService {
      */
     async getAvailableAlgorithms() {
         try {
-            const response = await axios.get(`${API_BASE_URL}/optimization/algorithms`);
+            const response = await axios.get(buildApiUrl('algorithms'), {
+                timeout: getApiTimeout()
+            });
             return Algorithm.fromAPIArray(response.data);
         } catch (error) {
             console.error('Error fetching algorithms:', error);
@@ -45,7 +46,9 @@ class OptimizationService {
      */
     async getAlgorithmById(algorithmId) {
         try {
-            const response = await axios.get(`${API_BASE_URL}/optimization/algorithms/${algorithmId}`);
+            const response = await axios.get(`${buildApiUrl('algorithms')}/${algorithmId}`, {
+                timeout: getApiTimeout()
+            });
             return Algorithm.fromAPI(response.data);
         } catch (error) {
             console.error(`Error fetching algorithm ${algorithmId}:`, error);
@@ -88,8 +91,9 @@ class OptimizationService {
             };
 
             const response = await axios.post(
-                `${API_BASE_URL}/v1/routes/compute`,
-                payload
+                buildApiUrl('optimization'),
+                payload,
+                { timeout: getApiTimeout() }
             );
             return response.data;
         } catch (error) {
