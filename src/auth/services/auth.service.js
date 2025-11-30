@@ -6,9 +6,10 @@
  * @module modules/auth/services/authService
  */
 
+import axios from 'axios';
 import {User} from "@/auth/model/user.entity.js";
 import {AuthToken} from "@/auth/model/auth-token.entity.js";
-import userService from "@/auth/services/user.service.js";
+import { buildApiUrl, getApiTimeout } from '@/config/environment.js';
 
 /**
  * Auth Service class for API interactions
@@ -24,20 +25,27 @@ class AuthService {
      */
     async login(email, password) {
         try {
-            // Use userService to find user directly from db.json
-            const user = await userService.findByEmailAndPassword(email, password);
-            
-            if (!user) {
-                throw new Error('Invalid email or password');
-            }
+            const response = await axios.post(
+                `${buildApiUrl('auth')}/sign-in`,
+                { email, password },
+                { timeout: getApiTimeout() }
+            );
 
-            // Generate mock token
+            const data = response.data;
+
+            // Backend response: { id, full_name, email, token }
             const token = AuthToken.fromAPI({
-                accessToken: `mock_token_${Date.now()}`,
-                refreshToken: `mock_refresh_${Date.now()}`,
-                expiresIn: 3600,
+                accessToken: data.token,
+                refreshToken: '',
+                expiresIn: 1800, // 30 minutes
                 tokenType: 'Bearer',
                 createdAt: new Date().toISOString()
+            });
+
+            const user = User.fromAPI({
+                id: data.id,
+                name: data.full_name,
+                email: data.email
             });
 
             return {
@@ -47,10 +55,12 @@ class AuthService {
         } catch (error) {
             console.error('Error during login:', error);
             
-            if (error.message === 'Invalid email or password') {
-                throw error;
+            if (error.response?.status === 400) {
+                throw new Error('Invalid email or password');
             }
-            throw new Error('Failed to login. Please try again.');
+            
+            const errorMessage = error.response?.data?.detail || 'Failed to login. Please try again.';
+            throw new Error(errorMessage);
         }
     }
 
@@ -67,34 +77,44 @@ class AuthService {
      */
     async register(userData) {
         try {
-            // Use userService to create user directly in db.json
-            const user = await userService.create({
-                email: userData.email,
-                password: userData.password,
-                name: userData.name,
-                role: 'user'
+            const response = await axios.post(
+                `${buildApiUrl('auth')}/sign-up`,
+                {
+                    full_name: userData.name,
+                    email: userData.email,
+                    password: userData.password,
+                    confirm_password: userData.password
+                },
+                { timeout: getApiTimeout() }
+            );
+
+            const data = response.data;
+
+            // Backend response: { id, full_name, email } (no token in sign-up)
+            // User needs to login after registration
+            const user = User.fromAPI({
+                id: data.id,
+                name: data.full_name,
+                email: data.email
             });
 
-            // Generate mock token
-            const token = AuthToken.fromAPI({
-                accessToken: `mock_token_${Date.now()}`,
-                refreshToken: `mock_refresh_${Date.now()}`,
-                expiresIn: 3600,
-                tokenType: 'Bearer',
-                createdAt: new Date().toISOString()
-            });
-
+            // No token returned from sign-up, return null token
             return {
-                token,
+                token: null,
                 user
             };
         } catch (error) {
             console.error('Error during registration:', error);
             
-            if (error.message === 'Email already exists') {
-                throw error;
+            if (error.response?.status === 400) {
+                const errorDetail = error.response?.data?.detail;
+                if (typeof errorDetail === 'string' && errorDetail.includes('already')) {
+                    throw new Error('Email already registered');
+                }
             }
-            throw new Error('Failed to register. Please try again.');
+            
+            const errorMessage = error.response?.data?.detail || 'Failed to register. Please try again.';
+            throw new Error(errorMessage);
         }
     }
 

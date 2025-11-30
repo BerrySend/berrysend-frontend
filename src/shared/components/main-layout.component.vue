@@ -60,7 +60,6 @@ export default {
       const routeMap = {
         'visualization': '/visualization',
         'optimization': '/optimization',
-        'results': '/results',
         'management': '/management'
       };
 
@@ -79,8 +78,6 @@ export default {
         activeTab.value = 'visualization';
       } else if (path.includes('optimization')) {
         activeTab.value = 'optimization';
-      } else if (path.includes('results')) {
-        activeTab.value = 'results';
       } else if (path.includes('management')) {
         activeTab.value = 'management';
       }

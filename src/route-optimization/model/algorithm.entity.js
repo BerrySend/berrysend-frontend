@@ -160,7 +160,7 @@ export const PredefinedAlgorithms = {
         isRecommended: true
     },
     A_STAR: {
-        id: 'a-star',
+        id: 'a*',
         name: 'A*',
         description: 'Búsqueda heurística eficiente',
         complexity: 'O(b^d)',

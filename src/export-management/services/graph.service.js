@@ -13,7 +13,5 @@ export const graphService = {
 
   getEdges: () => axios.get(`${API_URL}/api/v1/port-connections/`, { timeout: API_TIMEOUT }),
 
-  getRoutes: () => axios.get(`${API_URL}/api/v1/port-connections/`, { timeout: API_TIMEOUT }),
-
-  getOptimalRoute: () => axios.get(`${API_URL}/optimalRoute`, { timeout: API_TIMEOUT }),
+  getRoutes: () => axios.get(`${API_URL}/api/v1/port-connections/`, { timeout: API_TIMEOUT })
 };

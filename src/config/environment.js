@@ -11,11 +11,11 @@
 export const getEnvironmentConfig = () => {
   const config = {
     // API Configuration
-    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
     apiTimeout: import.meta.env.VITE_API_TIMEOUT || 30000,
 
     // Google Maps Configuration
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 
     // Application Settings
     appName: import.meta.env.VITE_APP_NAME || 'BerrySend',
@@ -23,11 +23,13 @@ export const getEnvironmentConfig = () => {
 
     // Endpoints (can be customized via env)
     endpoints: {
+      auth: import.meta.env.VITE_AUTH_ENDPOINT_PATH || '/api/v1/auth',
       users: import.meta.env.VITE_USER_ENDPOINT_PATH || '/users',
       ports: import.meta.env.VITE_PORTS_ENDPOINT_PATH || '/api/v1/ports',
       portConnections: import.meta.env.VITE_PORT_CONNECTIONS_ENDPOINT_PATH || '/api/v1/port-connections',
       routes: import.meta.env.VITE_ROUTES_ENDPOINT_PATH || '/api/v1/routes',
-      exports: import.meta.env.VITE_EXPORTS_ENDPOINT_PATH || '/exports',
+      optimizedRoutes: import.meta.env.VITE_OPTIMIZED_ROUTES_ENDPOINT_PATH || '/api/v1/optimized-routes',
+      exports: import.meta.env.VITE_EXPORTS_ENDPOINT_PATH || '/api/v1/exports',
       algorithms: import.meta.env.VITE_ALGORITHMS_ENDPOINT_PATH || '/algorithms',
       optimization: import.meta.env.VITE_OPTIMIZATION_ENDPOINT_PATH || '/api/v1/routes/compute'
     },
@@ -69,8 +71,9 @@ export const validateEnvironment = () => {
     console.warn('Warning: VITE_GOOGLE_MAPS_API_KEY is not configured');
   }
 
-  if (!config.apiBaseUrl) {
-    throw new Error('Critical: VITE_API_BASE_URL is not configured');
+  // apiBaseUrl can be empty in development (uses Vite proxy)
+  if (config.isProduction && !config.apiBaseUrl) {
+    throw new Error('Critical: VITE_API_BASE_URL must be configured for production');
   }
 };
 

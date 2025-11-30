@@ -136,6 +136,84 @@
             </svg>
             {{ isOptimizing ? 'Optimizando Ruta...' : 'Optimizar Ruta' }}
           </button>
+          
+          <!-- Compare Algorithms Button -->
+          <button
+              @click="compareAllAlgorithms"
+              :disabled="!canOptimize || isComparing"
+              class="w-full mt-3 px-6 py-3 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <svg
+                v-if="isComparing"
+                class="w-5 h-5 animate-spin"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <svg
+                v-else
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            {{ isComparing ? 'Comparando Algoritmos...' : 'Comparar Todos los Algoritmos' }}
+          </button>
+        </div>
+        
+        <!-- Comparison Results -->
+        <div v-if="comparisonResults.length > 0" class="bg-white rounded-xl border border-gray-200 p-6 mt-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Comparación de Algoritmos
+          </h2>
+          
+          <div class="space-y-4">
+            <div
+                v-for="result in comparisonResults"
+                :key="result.algorithm"
+                class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-gray-900 flex items-center gap-2">
+                  <span
+                      v-if="result.isBest"
+                      class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full"
+                  >
+                    ⭐ Mejor Opción
+                  </span>
+                  {{ result.algorithm }}
+                </h3>
+                <span class="text-xs text-gray-500">{{ result.execution_time }}ms</span>
+              </div>
+              
+              <div class="grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <p class="text-gray-600">Distancia</p>
+                  <p class="font-semibold text-gray-900">{{ result.total_distance }} km</p>
+                </div>
+                <div>
+                  <p class="text-gray-600">Tiempo</p>
+                  <p class="font-semibold text-gray-900">{{ result.total_time }} hrs</p>
+                </div>
+                <div>
+                  <p class="text-gray-600">Costo</p>
+                  <p class="font-semibold text-gray-900">${{ result.total_cost.toLocaleString() }}</p>
+                </div>
+              </div>
+              
+              <div class="mt-3 pt-3 border-t border-gray-200">
+                <p class="text-xs text-gray-600 mb-1">Ruta:</p>
+                <p class="text-xs font-mono text-gray-900">{{ result.visited_ports.join(' → ') }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -272,6 +350,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import optimizationService from '../services/optimization.service';
+import portService from '@/port-management/services/port.service';
 import OptimizationConfig from "@/route-optimization/model/optimization-config.entity.js";
 import { OptimizationObjectiveLabels} from "@/route-optimization/model/optimization-config.entity.js";
 
@@ -290,27 +369,19 @@ export default {
     const selectedAlgorithm = ref(null);
     const loadingAlgorithms = ref(false);
     const isOptimizing = ref(false);
+    const isComparing = ref(false);
+    const optimizationResult = ref(null);
+    const comparisonResults = ref([]);
 
     const config = ref(new OptimizationConfig({
-      cargoAmount: 1000,
+      cargoAmount: 1,
       objective: 'minimize_time'
     }));
 
-    // Mock ports data (should come from port service)
-    const originPorts = ref([
-      { id: 'callao', name: 'Puerto del Callao', country: 'Perú' },
-      { id: 'paita', name: 'Puerto de Paita', country: 'Perú' },
-      { id: 'matarani', name: 'Puerto de Matarani', country: 'Perú' }
-    ]);
-
-    const destinationPorts = ref([
-      { id: 'shanghai', name: 'Puerto de Shanghai', country: 'China' },
-      { id: 'rotterdam', name: 'Puerto de Rotterdam', country: 'Países Bajos' },
-      { id: 'hamburg', name: 'Puerto de Hamburgo', country: 'Alemania' },
-      { id: 'losangeles', name: 'Puerto de Los Ángeles', country: 'Estados Unidos' },
-      { id: 'tokyo', name: 'Puerto de Tokio', country: 'Japón' },
-      { id: 'miami', name: 'Puerto de Miami', country: 'Estados Unidos' }
-    ]);
+    // Ports loaded from backend
+    const originPorts = ref([]);
+    const destinationPorts = ref([]);
+    const loadingPorts = ref(false);
 
     const objectiveLabels = OptimizationObjectiveLabels;
 
@@ -326,6 +397,26 @@ export default {
           config.value.cargoAmount > 0
       );
     });
+
+    /**
+     * Fetch ports from backend
+     */
+    const fetchPorts = async () => {
+      loadingPorts.value = true;
+      try {
+        const ports = await portService.getAllPorts();
+        console.log('✅ Puertos cargados:', ports);
+        console.log('📍 Primer puerto:', ports[0]);
+        console.log('🔑 ID del primer puerto:', ports[0]?.id);
+        originPorts.value = ports;
+        destinationPorts.value = ports;
+      } catch (error) {
+        console.error('Error fetching ports:', error);
+        alert('Error cargando puertos. Por favor recargue la página.');
+      } finally {
+        loadingPorts.value = false;
+      }
+    };
 
     /**
      * Fetch available algorithms
@@ -364,9 +455,70 @@ export default {
 
       isOptimizing.value = true;
       try {
-        await optimizationService.executeOptimization(config.value);
+        console.log('🔍 DEBUG - Config antes de enviar:');
+        console.log('  originPortId:', config.value.originPortId);
+        console.log('  destinationPortId:', config.value.destinationPortId);
+        console.log('  Tipo de originPortId:', typeof config.value.originPortId);
+        console.log('  Tipo de destinationPortId:', typeof config.value.destinationPortId);
+        
+        // Determine mode based on origin port name
+        const originPort = originPorts.value.find(p => p.id === config.value.originPortId);
+        const isAirPort = originPort?.name?.includes('(') && originPort?.name?.includes(')');
+        const transportMode = isAirPort ? 'air' : 'maritime';
+        
+        console.log('🚢 Puerto origen:', originPort?.name, '→ Modo:', transportMode);
+        
+        // Prepare params according to backend API specification
+        const params = {
+          source: config.value.originPortId,
+          destination: config.value.destinationPortId,
+          mode: transportMode,
+          algorithm_name: selectedAlgorithm.value.id,
+          export_weight: config.value.cargoAmount
+        };
+        
+        console.log('📤 Params a enviar:', JSON.stringify(params, null, 2));
 
-        alert('Optimization completed successfully!');
+        // Only add parameters for bellman-ford
+        if (selectedAlgorithm.value.id === 'bellman-ford') {
+          params.parameters = {
+            cost_multiplier: 0.4,
+            distance_multiplier: 0.3,
+            time_multiplier: 0.3
+          };
+        }
+
+        const result = await optimizationService.computeOptimalRoute(params);
+        
+        // Store result
+        optimizationResult.value = result;
+        
+        // Store in sessionStorage to pass to visualization page
+        sessionStorage.setItem('optimizedRoute', JSON.stringify(result));
+        
+        // Check if backend returned optimized_route_id or we need to use route_id
+        const routeId = result.optimized_route_id || result.route_id || result.id;
+        
+        if (!routeId) {
+          console.error('❌ No se encontró ID de ruta en la respuesta del backend');
+          alert('Error: La ruta fue optimizada pero no se recibió un ID.');
+          return;
+        }
+        
+        // Store optimization result to create export in visualization page
+        sessionStorage.setItem('pendingExportData', JSON.stringify({
+          optimized_route_id: routeId,
+          comercial_description: '', // Will be filled in visualization page
+          transportation_mode: result.route_mode,
+          gross_weight: config.value.cargoAmount,
+          net_weight: config.value.cargoAmount * 0.9, // Estimate
+          us_fob: result.total_cost,
+          unit: 'ton',
+          quantity: config.value.cargoAmount
+        }));
+        
+        // Navigate to visualization
+        window.location.href = '/visualization';
       } catch (error) {
         console.error('Error executing optimization:', error);
         alert(`Error: ${error.message}`);
@@ -374,9 +526,99 @@ export default {
         isOptimizing.value = false;
       }
     };
+    
+    /**
+     * Compare all algorithms
+     */
+    const compareAllAlgorithms = async () => {
+      if (!canOptimize.value) return;
+
+      isComparing.value = true;
+      comparisonResults.value = [];
+      
+      try {
+        console.log('🔍 Comparando todos los algoritmos...');
+        
+        const results = [];
+        
+        // Determine mode based on origin port name
+        const originPort = originPorts.value.find(p => p.id === config.value.originPortId);
+        const isAirPort = originPort?.name?.includes('(') && originPort?.name?.includes(')');
+        const transportMode = isAirPort ? 'air' : 'maritime';
+        
+        // Execute optimization with each algorithm
+        for (const algorithm of algorithms.value) {
+          const startTime = performance.now();
+          
+          const params = {
+            source: config.value.originPortId,
+            destination: config.value.destinationPortId,
+            mode: transportMode,
+            algorithm_name: algorithm.id,
+            export_weight: config.value.cargoAmount
+          };
+          
+          // Add parameters for bellman-ford
+          if (algorithm.id === 'bellman-ford') {
+            params.parameters = {
+              cost_multiplier: 0.4,
+              distance_multiplier: 0.3,
+              time_multiplier: 0.3
+            };
+          }
+          
+          try {
+            const result = await optimizationService.computeOptimalRoute(params);
+            const endTime = performance.now();
+            
+            results.push({
+              algorithm: algorithm.name,
+              algorithm_id: algorithm.id,
+              execution_time: Math.round(endTime - startTime),
+              total_distance: result.total_distance,
+              total_time: result.total_time,
+              total_cost: result.total_cost,
+              visited_ports: result.visited_ports,
+              success: true
+            });
+            
+            console.log(`✅ ${algorithm.name}: ${result.total_cost} USD, ${result.total_distance} km, ${result.total_time} hrs`);
+          } catch (error) {
+            console.error(`❌ Error con ${algorithm.name}:`, error);
+            results.push({
+              algorithm: algorithm.name,
+              algorithm_id: algorithm.id,
+              execution_time: 0,
+              error: error.message,
+              success: false
+            });
+          }
+        }
+        
+        // Find best result (lowest cost)
+        const successfulResults = results.filter(r => r.success);
+        if (successfulResults.length > 0) {
+          const bestResult = successfulResults.reduce((best, current) => 
+            current.total_cost < best.total_cost ? current : best
+          );
+          bestResult.isBest = true;
+        }
+        
+        comparisonResults.value = results;
+        
+        console.log('📊 Comparación completada:', results);
+        
+      } catch (error) {
+        console.error('Error comparing algorithms:', error);
+        alert(`Error al comparar algoritmos: ${error.message}`);
+      } finally {
+        isComparing.value = false;
+      }
+    };
 
     // Lifecycle
     onMounted(() => {
+      fetchPorts();
       fetchAlgorithms();
     });
 
@@ -384,14 +626,19 @@ export default {
       algorithms,
       selectedAlgorithm,
       loadingAlgorithms,
+      loadingPorts,
       isOptimizing,
+      isComparing,
+      optimizationResult,
+      comparisonResults,
       config,
       originPorts,
       destinationPorts,
       objectiveLabels,
       canOptimize,
       selectAlgorithm,
-      executeOptimization
+      executeOptimization,
+      compareAllAlgorithms
     };
   }
 };

@@ -223,6 +223,112 @@
         <p class="text-sm text-gray-600">Rutas Aéreas</p>
       </div>
     </div>
+    
+    <!-- Export Creation Modal -->
+    <div
+        v-if="showExportModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        @click.self="cancelExport"
+    >
+      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900">Guardar Export</h3>
+          <button
+              @click="cancelExport"
+              class="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <p class="text-sm text-gray-600 mb-6">
+          La ruta ha sido optimizada exitosamente. Complete la información para guardar el export.
+        </p>
+        
+        <div class="space-y-4">
+          <!-- Commercial Description -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Descripción Comercial *
+            </label>
+            <input
+                v-model="exportForm.comercial_description"
+                type="text"
+                placeholder="Ej: Arándanos frescos"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <!-- Quantity -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Cantidad
+            </label>
+            <input
+                v-model.number="exportForm.quantity"
+                type="number"
+                min="0"
+                step="0.01"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <!-- Unit -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Unidad
+            </label>
+            <select
+                v-model="exportForm.unit"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="kg">Kilogramos (kg)</option>
+              <option value="ton">Toneladas (ton)</option>
+              <option value="lb">Libras (lb)</option>
+            </select>
+          </div>
+          
+          <!-- Route Info Summary -->
+          <div v-if="pendingExport" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-blue-900 mb-2">Información de la Ruta</h4>
+            <div class="space-y-1 text-xs text-blue-800">
+              <p><strong>Modo:</strong> {{ pendingExport.transportation_mode }}</p>
+              <p><strong>Peso bruto:</strong> {{ pendingExport.gross_weight }} kg</p>
+              <p><strong>Peso neto:</strong> {{ pendingExport.net_weight }} kg</p>
+              <p><strong>Valor FOB:</strong> ${{ pendingExport.us_fob.toLocaleString() }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex gap-3 mt-6">
+          <button
+              @click="cancelExport"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+              @click="saveExport"
+              :disabled="savingExport || !exportForm.comercial_description.trim()"
+              class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <svg
+                v-if="savingExport"
+                class="w-5 h-5 animate-spin"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>{{ savingExport ? 'Guardando...' : 'Guardar Export' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -262,6 +368,16 @@ export default {
     const exportsList = ref([]);
     const loadingExports = ref(false);
     const selectedExport = ref(null);
+    
+    // Pending export from optimization
+    const pendingExport = ref(null);
+    const showExportModal = ref(false);
+    const exportForm = ref({
+      comercial_description: '',
+      unit: 'ton',
+      quantity: 0
+    });
+    const savingExport = ref(false);
 
     const transportModes = [
       { id: 'all', label: 'Etiquetas', icon: EyeIcon, activeClass: 'bg-blue-500 text-white' },
@@ -310,51 +426,16 @@ export default {
 
     const loadGraphData = async () => {
       try {
-        const [nodesRes, edgesRes, optimalRes] = await Promise.all([
+        const [nodesRes, edgesRes] = await Promise.all([
           graphService.getNodes(),
-          graphService.getEdges(),
-          graphService.getOptimalRoute()
+          graphService.getEdges()
         ]);
 
         graphNodes.value = nodesRes.data.map(node => new GraphNode(node));
         graphEdges.value = edgesRes.data.map(e => new GraphEdge(e));
 
-        const routeNodeIds = optimalRes.data;
-        const optimalRouteEdges = [];
-
-        if (Array.isArray(routeNodeIds) && routeNodeIds.length > 0) {
-          if (typeof routeNodeIds[0] === 'string') {
-            for (let i = 0; i < routeNodeIds.length - 1; i++) {
-              const fromId = routeNodeIds[i];
-              const toId = routeNodeIds[i + 1];
-
-              const edge = graphEdges.value.find(e =>
-                (e.source === fromId && e.target === toId) ||
-                (e.source === toId && e.target === fromId) ||
-                (e.port_a_id === fromId && e.port_b_id === toId) ||
-                (e.port_a_id === toId && e.port_b_id === fromId)
-              );
-
-              if (edge) {
-                optimalRouteEdges.push(edge);
-              } else {
-                optimalRouteEdges.push(new GraphEdge({
-                  source: fromId,
-                  target: toId,
-                  mode: 'maritime',
-                  distance: 0,
-                  time: 0,
-                  cost: 0,
-                  isOptimal: true
-                }));
-              }
-            }
-          } else {
-            optimalRouteEdges.push(...routeNodeIds.map(edge => new GraphEdge(edge)));
-          }
-        }
-
-        optimalRoute.value = optimalRouteEdges;
+        // Optimal route will be loaded from session storage or when an export is selected
+        optimalRoute.value = [];
 
       } catch (error) {
         console.error('Error loading graph data:', error);
@@ -376,56 +457,273 @@ export default {
     const selectExport = async (exportItem) => {
       selectedExport.value = exportItem;
 
-      const routeStr = exportItem.route_id;
-      const portIds = routeStr.split('-');
-
-      console.log('📍 Export seleccionado:', exportItem.commercial_description);
-      console.log('🛣️ Route ID:', routeStr);
-      console.log('🚢 Puertos en ruta:', portIds);
+      console.log('📍 Export seleccionado:', exportItem);
 
       try {
-        const [portsRes, connectionsRes] = await Promise.all([
-          graphService.getNodes(),
-          graphService.getEdges()
-        ]);
-
-        graphNodes.value = portsRes.data.map(node => new GraphNode(node));
-        graphEdges.value = connectionsRes.data.map(edge => new GraphEdge(edge));
-
-        console.log('✅ Total de nodos:', graphNodes.value.length);
-        console.log('✅ Total de aristas:', graphEdges.value.length);
-
-        const optimalRouteEdges = [];
-        for (let i = 0; i < portIds.length - 1; i++) {
-          const fromId = portIds[i];
-          const toId = portIds[i + 1];
-
-          const edge = graphEdges.value.find(e =>
-            (e.source === fromId && e.target === toId) ||
-            (e.source === toId && e.target === fromId) ||
-            (e.port_a_id === fromId && e.port_b_id === toId) ||
-            (e.port_a_id === toId && e.port_b_id === fromId)
-          );
-
-          if (edge) {
-            optimalRouteEdges.push(edge);
-            console.log(`✅ Arista ${i}: ${fromId} → ${toId}`);
-          } else {
-            console.warn(`⚠️ No se encontró arista entre ${fromId} y ${toId}`);
+        // If export has optimized_route in the response, use it directly
+        if (exportItem.optimized_route && exportItem.optimized_route.visited_ports) {
+          const routeData = exportItem.optimized_route;
+          console.log('✅ Ruta optimizada encontrada en export:', routeData);
+          
+          // Create edges between consecutive ports using visited_ports
+          const routeEdges = [];
+          const visitedPorts = routeData.visited_ports;
+          
+          for (let i = 0; i < visitedPorts.length - 1; i++) {
+            const fromPortName = visitedPorts[i];
+            const toPortName = visitedPorts[i + 1];
+            
+            // Find port nodes by name
+            const fromNode = graphNodes.value.find(n => n.name === fromPortName);
+            const toNode = graphNodes.value.find(n => n.name === toPortName);
+            
+            if (!fromNode || !toNode) {
+              console.warn(`Port not found: ${fromPortName} or ${toPortName}`);
+              continue;
+            }
+            
+            // Try to find existing edge in graph
+            const existingEdge = graphEdges.value.find(e =>
+              (e.source === fromNode.id && e.target === toNode.id) ||
+              (e.target === fromNode.id && e.source === toNode.id)
+            );
+            
+            if (existingEdge) {
+              routeEdges.push(new GraphEdge({
+                ...existingEdge,
+                isOptimal: true
+              }));
+            } else {
+              // Create new edge for visualization
+              routeEdges.push(new GraphEdge({
+                source: fromNode.id,
+                target: toNode.id,
+                mode: routeData.route_mode || 'maritime',
+                isOptimal: true
+              }));
+            }
           }
+          
+          optimalRoute.value = routeEdges;
+          console.log('🎯 Ruta óptima cargada:', routeEdges.length, 'conexiones');
+          
+        } else if (exportItem.optimized_route_id) {
+          // Export has route ID but not the full route data
+          // Try to fetch the route separately
+          console.log('📡 Cargando ruta por ID:', exportItem.optimized_route_id);
+          
+          try {
+            const routeData = await ExportService.getRouteById(exportItem.optimized_route_id);
+            console.log('✅ Ruta cargada desde API:', routeData);
+            
+            // Create edges using the fetched route data
+            const routeEdges = [];
+            const visitedPorts = routeData.visited_ports || [];
+            
+            for (let i = 0; i < visitedPorts.length - 1; i++) {
+              const fromPortName = visitedPorts[i];
+              const toPortName = visitedPorts[i + 1];
+              
+              const fromNode = graphNodes.value.find(n => n.name === fromPortName);
+              const toNode = graphNodes.value.find(n => n.name === toPortName);
+              
+              if (!fromNode || !toNode) {
+                console.warn(`Port not found: ${fromPortName} or ${toPortName}`);
+                continue;
+              }
+              
+              const existingEdge = graphEdges.value.find(e =>
+                (e.source === fromNode.id && e.target === toNode.id) ||
+                (e.target === fromNode.id && e.source === toNode.id)
+              );
+              
+              if (existingEdge) {
+                routeEdges.push(new GraphEdge({
+                  ...existingEdge,
+                  isOptimal: true
+                }));
+              } else {
+                routeEdges.push(new GraphEdge({
+                  source: fromNode.id,
+                  target: toNode.id,
+                  mode: routeData.route_mode || 'maritime',
+                  isOptimal: true
+                }));
+              }
+            }
+            
+            optimalRoute.value = routeEdges;
+            console.log('🎯 Ruta óptima cargada desde API:', routeEdges.length, 'conexiones');
+            
+          } catch (routeError) {
+            console.error('❌ Error cargando ruta:', routeError);
+            optimalRoute.value = [];
+          }
+          
+        } else {
+          console.warn('Export no tiene ruta optimizada asociada');
+          optimalRoute.value = [];
         }
-
-        optimalRoute.value = optimalRouteEdges;
-        console.log('🎯 Ruta óptima actualizada con', optimalRouteEdges.length, 'aristas en rojo');
 
       } catch (error) {
         console.error('❌ Error al seleccionar exportación:', error);
       }
     };
 
+    /**
+     * Save export from optimization result
+     */
+    const saveExport = async () => {
+      if (!pendingExport.value) return;
+      
+      if (!exportForm.value.comercial_description.trim()) {
+        alert('Por favor ingrese una descripción comercial');
+        return;
+      }
+      
+      if (!pendingExport.value?.optimized_route_id) {
+        alert('Error: No se encontró el ID de la ruta optimizada');
+        return;
+      }
+      
+      savingExport.value = true;
+      try {
+        // Get user ID from localStorage (berrysend_user key)
+        const storedUser = localStorage.getItem('berrysend_user');
+        if (!storedUser) {
+          throw new Error('Usuario no autenticado. Por favor inicie sesión nuevamente.');
+        }
+        
+        const userData = JSON.parse(storedUser);
+        const userId = userData.id;
+        
+        if (!userId) {
+          throw new Error('ID de usuario no encontrado');
+        }
+        
+        // Validate all required fields
+        const gross_weight = Number(pendingExport.value.gross_weight);
+        const net_weight = Number(pendingExport.value.net_weight);
+        const us_fob = Number(pendingExport.value.us_fob);
+        const quantity = Number(exportForm.value.quantity);
+        
+        if (gross_weight <= 0 || net_weight <= 0 || quantity <= 0) {
+          throw new Error('Los pesos y cantidad deben ser mayores a 0');
+        }
+        
+        const exportData = {
+          comercial_description: exportForm.value.comercial_description.trim(),
+          transportation_mode: pendingExport.value.transportation_mode,
+          us_fob: us_fob,
+          gross_weight: gross_weight,
+          net_weight: net_weight,
+          unit: exportForm.value.unit,
+          quantity: quantity,
+          optimized_route_id: pendingExport.value.optimized_route_id,
+          user_id: userId
+        };
+        
+        const createdExport = await ExportService.createExport(exportData);
+        
+        // Clear pending data
+        sessionStorage.removeItem('pendingExportData');
+        sessionStorage.removeItem('optimizedRoute');
+        pendingExport.value = null;
+        showExportModal.value = false;
+        
+        // Reload exports and select the new one
+        await loadExports();
+        const newExport = exportsList.value.find(e => e.export_id === createdExport.export_id);
+        if (newExport) {
+          selectExport(newExport);
+        }
+        
+      } catch (error) {
+        console.error('Error guardando export:', error);
+        
+        let errorMessage = 'Error al guardar el export';
+        if (error.response?.data?.detail) {
+          if (typeof error.response.data.detail === 'string') {
+            errorMessage = error.response.data.detail;
+          } else if (Array.isArray(error.response.data.detail)) {
+            errorMessage = error.response.data.detail.map(e => e.msg || e.message).join('\n');
+          }
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        alert(`Error al guardar:\n${errorMessage}`);
+      } finally {
+        savingExport.value = false;
+      }
+    };
+    
+    /**
+     * Cancel export creation
+     */
+    const cancelExport = () => {
+      sessionStorage.removeItem('pendingExportData');
+      sessionStorage.removeItem('optimizedRoute');
+      pendingExport.value = null;
+      showExportModal.value = false;
+      optimalRoute.value = [];
+    };
+
     onMounted(() => {
       loadGraphData();
       loadExports();
+      
+      // Check for pending export data from optimization
+      const pendingData = sessionStorage.getItem('pendingExportData');
+      const optimizedRouteData = sessionStorage.getItem('optimizedRoute');
+      
+      if (pendingData && optimizedRouteData) {
+        try {
+          pendingExport.value = JSON.parse(pendingData);
+          const routeResult = JSON.parse(optimizedRouteData);
+          
+          // Pre-fill form
+          exportForm.value.quantity = pendingExport.value.quantity || 0;
+          exportForm.value.unit = pendingExport.value.unit || 'ton';
+          
+          // Show modal
+          showExportModal.value = true;
+          
+          // Load the optimized route on the map
+          console.log('📍 Cargando ruta optimizada en el mapa:', routeResult);
+          
+          // Wait for graph data to load first
+          setTimeout(async () => {
+            if (routeResult.visited_ports && graphNodes.value.length > 0) {
+              const routeEdges = [];
+              const visitedPorts = routeResult.visited_ports;
+              
+              for (let i = 0; i < visitedPorts.length - 1; i++) {
+                const fromPortName = visitedPorts[i];
+                const toPortName = visitedPorts[i + 1];
+                
+                const fromNode = graphNodes.value.find(n => n.name === fromPortName);
+                const toNode = graphNodes.value.find(n => n.name === toPortName);
+                
+                if (fromNode && toNode) {
+                  routeEdges.push(new GraphEdge({
+                    source: fromNode.id,
+                    target: toNode.id,
+                    mode: routeResult.route_mode || 'maritime',
+                    isOptimal: true
+                  }));
+                }
+              }
+              
+              optimalRoute.value = routeEdges;
+              console.log('🎯 Ruta pendiente cargada en el mapa:', routeEdges.length, 'conexiones');
+            }
+          }, 1000);
+          
+        } catch (error) {
+          console.error('Error loading pending export:', error);
+        }
+      }
     });
 
     return {
@@ -437,6 +735,12 @@ export default {
       statistics,
       exportsList,
       loadingExports,
+      pendingExport,
+      showExportModal,
+      exportForm,
+      savingExport,
+      saveExport,
+      cancelExport,
       selectedExport,
       selectExport,
       getStatusClass,

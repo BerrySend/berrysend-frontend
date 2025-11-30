@@ -70,12 +70,12 @@ class OptimizationService {
      * Computes optimal route with given parameters
      *
      * @param {Object} params - Optimization parameters
-     * @param {string} params.source - Source port ID
-     * @param {string} params.destination - Destination port ID
-     * @param {string} params.mode - Transport mode
-     * @param {string} params.algorithm_name - Algorithm name
-     * @param {number} params.export_weight - Export weight in tons
-     * @param {Object} params.parameters - Algorithm specific parameters
+     * @param {string} params.source - Source port ID (UUID)
+     * @param {string} params.destination - Destination port ID (UUID)
+     * @param {string} params.mode - Transport mode ('maritime' or 'air')
+     * @param {string} params.algorithm_name - Algorithm name ('dijkstra', 'a*', 'bellman-ford')
+     * @param {number} params.export_weight - Export weight in TONS
+     * @param {Object} params.parameters - Algorithm specific parameters (only for bellman-ford)
      * @returns {Promise<Object>} Optimization result with optimal path
      * @throws {Error} If validation fails or API request fails
      */
@@ -86,19 +86,33 @@ class OptimizationService {
                 destination: params.destination,
                 mode: params.mode,
                 algorithm_name: params.algorithm_name,
-                export_weight: params.export_weight,
-                parameters: params.parameters || {}
+                export_weight: params.export_weight
             };
+
+            // Only include parameters for bellman-ford
+            if (params.algorithm_name === 'bellman-ford' && params.parameters) {
+                payload.parameters = params.parameters;
+            }
 
             const response = await axios.post(
                 buildApiUrl('optimization'),
                 payload,
                 { timeout: getApiTimeout() }
             );
+            
+            // Backend returns: { optimized_route_id, source, destination, connections, total_distance, total_time, total_cost, algorithm_used, parameters_used }
             return response.data;
         } catch (error) {
             console.error('Error computing optimal route:', error);
-            throw new Error('Failed to compute optimal route');
+            if (error.response?.status === 400) {
+                const errorDetail = error.response?.data?.detail;
+                throw new Error(errorDetail || 'Invalid parameters for route optimization');
+            }
+            if (error.response?.status === 404) {
+                throw new Error('Port not found');
+            }
+            const errorMessage = error.response?.data?.detail || 'Failed to compute optimal route';
+            throw new Error(errorMessage);
         }
     }
 
@@ -118,8 +132,9 @@ class OptimizationService {
 
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/optimization/compute`,
-                config.toJSON()
+                buildApiUrl('optimization'),
+                config.toJSON(),
+                { timeout: getApiTimeout() }
             );
             return response.data;
         } catch (error) {
@@ -144,8 +159,9 @@ class OptimizationService {
 
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/optimization/configurations`,
-                config.toJSON()
+                `${buildApiUrl('optimization')}/configurations`,
+                config.toJSON(),
+                { timeout: getApiTimeout() }
             );
             return OptimizationConfig.fromAPI(response.data);
         } catch (error) {
@@ -162,7 +178,10 @@ class OptimizationService {
      */
     async getSavedConfigurations() {
         try {
-            const response = await axios.get(`${API_BASE_URL}/optimization/configurations`);
+            const response = await axios.get(
+                `${buildApiUrl('optimization')}/configurations`,
+                { timeout: getApiTimeout() }
+            );
             return response.data.map(data => OptimizationConfig.fromAPI(data));
         } catch (error) {
             console.error('Error fetching configurations:', error);
@@ -181,11 +200,12 @@ class OptimizationService {
     async compareAlgorithms(config, algorithmIds) {
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/optimization/compare`,
+                `${buildApiUrl('optimization')}/compare`,
                 {
                     configuration: config.toJSON(),
                     algorithms: algorithmIds
-                }
+                },
+                { timeout: getApiTimeout() }
             );
             return response.data;
         } catch (error) {
@@ -202,7 +222,10 @@ class OptimizationService {
      */
     async getOptimizationStatistics() {
         try {
-            const response = await axios.get(`${API_BASE_URL}/optimization/statistics`);
+            const response = await axios.get(
+                `${buildApiUrl('optimization')}/statistics`,
+                { timeout: getApiTimeout() }
+            );
             return response.data;
         } catch (error) {
             console.error('Error fetching optimization statistics:', error);
@@ -221,8 +244,9 @@ class OptimizationService {
     async checkFeasibility(originPortId, destinationPortId) {
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/optimization/feasibility`,
-                { originPortId, destinationPortId }
+                `${buildApiUrl('optimization')}/feasibility`,
+                { originPortId, destinationPortId },
+                { timeout: getApiTimeout() }
             );
             return response.data;
         } catch (error) {
@@ -240,7 +264,11 @@ class OptimizationService {
      */
     async cancelOptimization(optimizationId) {
         try {
-            await axios.post(`${API_BASE_URL}/optimization/${optimizationId}/cancel`);
+            await axios.post(
+                `${buildApiUrl('optimization')}/${optimizationId}/cancel`,
+                {},
+                { timeout: getApiTimeout() }
+            );
         } catch (error) {
             console.error(`Error canceling optimization ${optimizationId}:`, error);
             throw new Error('Failed to cancel optimization');

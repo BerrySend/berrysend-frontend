@@ -149,7 +149,21 @@ export class Port {
      * @returns {Port} New Port instance
      */
     static fromAPI(data) {
-        return new Port(data);
+        // Map backend response to frontend model
+        return new Port({
+            id: data.id,
+            name: data.name,
+            country: data.country,
+            type: data.type || 'intermediate', // maritime/air from backend
+            capacity: data.capacity || 0,
+            coordinates: {
+                latitude: data.latitude || 0,
+                longitude: data.longitude || 0
+            },
+            connections: data.connections || 0,
+            createdAt: data.createdAt || data.created_at,
+            updatedAt: data.updatedAt || data.updated_at
+        });
     }
 
     /**
