@@ -159,11 +159,11 @@ export const PredefinedAlgorithms = {
         ],
         isRecommended: true
     },
-    A_STAR: {
-        id: 'a*',
-        name: 'A*',
-        description: 'Búsqueda heurística eficiente',
-        complexity: 'O(b^d)',
+    ASTAR: {
+        id: 'astar',
+        name: 'A* (A-Star)',
+        description: 'Algoritmo heurístico que optimiza la búsqueda usando distancia euclidiana como guía',
+        complexity: 'O(b^d) - depende de la heurística',
         metrics: {
             speed: 95,
             memoryUsage: 45,
@@ -201,28 +201,7 @@ export const PredefinedAlgorithms = {
         ],
         isRecommended: false
     },
-    FLOYD_WARSHALL: {
-        id: 'floyd-warshall',
-        name: 'Floyd-Warshall',
-        description: 'Todos los caminos más cortos',
-        complexity: 'O(V^3)',
-        metrics: {
-            speed: 40,
-            memoryUsage: 60,
-            precision: 100
-        },
-        advantages: [
-            'Encuentra todos los caminos',
-            'Maneja pesos negativos',
-            'Útil para análisis completo'
-        ],
-        considerations: [
-            'Muy lento para grafos grandes',
-            'Alto uso de memoria',
-            'Puede ser excesivo'
-        ],
-        isRecommended: false
-    }
+    // FLOYD_WARSHALL removed - not available in backend
 };
 
 export default Algorithm;
