@@ -29,16 +29,16 @@ export class Algorithm {
         this.id = data.id || null;
         this.name = data.name || '';
         this.description = data.description || '';
-        this.complexity = data.complexity || '';
+        this.complexity = data.complexity || 'N/A';
         this.metrics = {
-            speed: data.metrics?.speed || 0,
-            memoryUsage: data.metrics?.memoryUsage || 0,
-            precision: data.metrics?.precision || 0
+            speed: data.metrics?.speed ?? data.speed ?? 0,
+            memoryUsage: data.metrics?.memoryUsage ?? data.memory_usage ?? data.memoryUsage ?? 0,
+            precision: data.metrics?.precision ?? data.precision ?? 0
         };
-        this.advantages = data.advantages || [];
-        this.considerations = data.considerations || [];
-        this.isRecommended = data.isRecommended || false;
-        this.createdAt = data.createdAt || new Date().toISOString();
+        this.advantages = Array.isArray(data.advantages) ? data.advantages : (data.advantages ? [data.advantages] : []);
+        this.considerations = Array.isArray(data.considerations) ? data.considerations : (data.considerations ? [data.considerations] : []);
+        this.isRecommended = data.isRecommended ?? data.is_recommended ?? false;
+        this.createdAt = data.createdAt || data.created_at || new Date().toISOString();
     }
 
     /**

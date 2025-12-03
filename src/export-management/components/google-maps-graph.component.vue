@@ -1,4 +1,3 @@
-<!-- src/export-management/components/google-maps-graph.component.vue -->
 <template>
   <div class="maps-container">
     <div id="google-maps-container" ref="mapContainer" class="map-canvas"></div>
@@ -47,13 +46,15 @@ export default {
     let map = null;
     let markers = [];
     let polylines = [];
+    let optimalPolylines = [];
     let selectedNode = ref(null);
     let AdvancedMarkerElement = null;
     let google = null;
     let setOptionsInitialized = false;
+    let mapInitialized = false;
 
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
+    const apiKey = 'AIzaSyDhbalJZscF0_BhYnoewyh5Ah4bz74-Lu4';
+    const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || 'DEMO_MAP_ID';
 
     if (apiKey && !setOptionsInitialized) {
       setOptions({
@@ -62,7 +63,7 @@ export default {
       });
       setOptionsInitialized = true;
     } else {
-      console.error('VITE_GOOGLE_MAPS_API_KEY is not configured');
+      console.warn('VITE_GOOGLE_MAPS_API_KEY is not set. Google Maps may not function correctly.');
     }
 
     const isValidCoordinate = (lat, lng) => {
@@ -82,7 +83,16 @@ export default {
     };
 
     const initMap = async () => {
+      if (mapInitialized || !mapContainer.value) return;
+
       try {
+        if (mapContainer.value) {
+          if (map) {
+            map = null;
+          }
+          mapContainer.value.innerHTML = '';
+        }
+
         const mapsLib = await importLibrary('maps');
         const markerLib = await importLibrary('marker');
 
@@ -104,26 +114,18 @@ export default {
         map = new google.Map(mapContainer.value, {
           zoom: 4,
           center: mapCenter,
-          mapId: 'berrysend-map',
           mapTypeControl: false,
           fullscreenControl: false,
           zoomControl: true,
           streetViewControl: false,
           rotateControl: false,
-          scaleControl: true,
+          scaleControl: false,
           tilt: 0,
           gestureHandling: 'greedy',
-          restriction: {
-            latLngBounds: {
-              north: 85,
-              south: -85,
-              west: -180,
-              east: 180
-            },
-            strictBounds: false
-          }
+          mapId: mapId // <-- Agregado para evitar advertencia y habilitar marcadores avanzados
         });
 
+        mapInitialized = true;
         renderNodes();
         renderEdges();
         renderOptimalRoute();
@@ -157,8 +159,10 @@ export default {
 
     const renderNodes = () => {
       if (!map || !google) {
+        console.warn('Map or google not initialized');
         return;
       }
+
       markers.forEach(m => {
         try {
           if (m.map) m.map = null;
@@ -169,8 +173,8 @@ export default {
       });
       markers = [];
 
-
       if (props.nodes.length === 0) {
+        console.warn('No nodes to render');
         return;
       }
 
@@ -248,12 +252,9 @@ export default {
           markers.push(marker);
           successCount++;
         } catch (err) {
-          console.error(`Error creating marker for node ${node.id}:`, err);
           errorCount++;
         }
       });
-
-
     };
 
     const renderEdges = () => {
@@ -269,6 +270,7 @@ export default {
       polylines = [];
 
       const filteredEdges = props.edges.filter(edge => {
+        if (props.transportMode === 'route') return true;
         if (props.transportMode === 'all') return true;
         return edge.mode === props.transportMode;
       });
@@ -282,7 +284,6 @@ export default {
         const endNode = props.nodes.find(n => n.id === toId);
 
         if (!startNode || !endNode) {
-          console.warn(`Edge nodes not found: from=${fromId}, to=${toId}`, {edgeObj});
           return;
         }
 
@@ -291,7 +292,6 @@ export default {
 
         if (!isValidCoordinate(startCoords.lat, startCoords.lng) ||
             !isValidCoordinate(endCoords.lat, endCoords.lng)) {
-          console.warn('Invalid coordinates for edge:', {edge: {from: fromId, to: toId}, startCoords, endCoords});
           return;
         }
 
@@ -307,13 +307,21 @@ export default {
 
           polylines.push(polyline);
         } catch (err) {
-          console.error('Error creating polyline:', err);
         }
       });
     };
 
     const renderOptimalRoute = () => {
       if (!map || !google) return;
+
+      optimalPolylines.forEach(p => {
+        try {
+          p.setMap(null);
+        } catch (e) {
+        }
+      });
+      optimalPolylines = [];
+
       if (props.optimalRoute.length === 0) {
         return;
       }
@@ -363,24 +371,32 @@ export default {
           map: map
         });
 
-        polylines.push(optimalPolyline);
+        optimalPolylines.push(optimalPolyline);
       } catch (err) {
-        console.error('Error creating optimal route polyline:', err);
       }
     };
 
     onMounted(initMap);
 
     watch(() => props.nodes, () => {
-      if (map) renderNodes();
+      if (map && mapInitialized) {
+        renderNodes();
+      }
     }, {deep: true});
 
     watch(() => props.transportMode, () => {
-      if (map) renderEdges();
+      if (map && mapInitialized) {
+        renderEdges();
+        if (props.optimalRoute && props.optimalRoute.length > 0) {
+          renderOptimalRoute();
+        }
+      }
     });
 
     watch(() => props.optimalRoute, () => {
-      if (map) renderOptimalRoute();
+      if (map && mapInitialized) {
+        renderOptimalRoute();
+      }
     }, {deep: true});
 
     return {
@@ -402,6 +418,9 @@ export default {
   width: 100%;
   height: 500px;
   border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  background: #e0e7ff;
 }
 
 .map-info {
@@ -412,6 +431,7 @@ export default {
   padding: 8px 12px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 .node-info {

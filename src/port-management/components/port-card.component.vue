@@ -22,7 +22,7 @@
           :class="portTypeBadgeClass"
           class="px-3 py-1 rounded-full text-xs font-medium"
       >
-        {{ portTypeLabel }}
+        {{ portLocationLabel }}
       </span>
     </div>
 
@@ -57,7 +57,6 @@
 
 <script>
 import { computed } from 'vue';
-import {PortTypeLabels} from "@/port-management/model/port.entity.js";
 
 /**
  * PortCard Component
@@ -80,20 +79,19 @@ export default {
   },
 
   setup(props, { emit }) {
-    const portTypeLabel = computed(() => {
-      return PortTypeLabels[props.port.type] || 'Unknown';
+    const portLocationLabel = computed(() => {
+      return props.port.getLocationTypeLabel();
     });
 
     const portTypeBadgeClass = computed(() => {
-      const baseClasses = 'px-3 py-1 rounded-full text-xs font-medium';
+      const locationType = props.port.getLocationType();
 
       const typeClasses = {
-        'origin': 'bg-blue-100 text-blue-700',
-        'destination': 'bg-purple-100 text-purple-700',
-        'intermediate': 'bg-gray-100 text-gray-700'
+        'nacional': 'bg-emerald-100 text-emerald-700',
+        'internacional': 'bg-amber-100 text-amber-700'
       };
 
-      return typeClasses[props.port.type] || 'bg-gray-100 text-gray-700';
+      return typeClasses[locationType] || 'bg-gray-100 text-gray-700';
     });
 
     const onEdit = () => {
@@ -112,7 +110,7 @@ export default {
     };
 
     return {
-      portTypeLabel,
+      portLocationLabel,
       portTypeBadgeClass,
       onEdit,
       onDelete,

@@ -39,10 +39,10 @@
           <button
               v-for="mode in transportModes"
               :key="mode.id"
-              @click="activeTransportMode = mode.id"
+              @click="handleTransportModeClick(mode.id)"
               :class="[
               'px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2',
-              activeTransportMode === mode.id
+              (mode.id === 'route' ? hasActiveOptimalRoute : activeTransportMode === mode.id)
                 ? mode.activeClass
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
@@ -111,15 +111,12 @@
           <thead>
             <tr class="border-b border-gray-200">
               <th class="text-left py-3 px-4 font-semibold text-gray-700">ID</th>
-              <th class="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">Descripción Comercial</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">Modo Transporte</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">FOB USD</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">Peso Bruto</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">Peso Neto</th>
-              <th class="text-left py-3 px-4 font-semibold text-gray-700">Unidad</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">Cantidad</th>
-              <th class="text-left py-3 px-4 font-semibold text-gray-700">Estado</th>
               <th class="text-left py-3 px-4 font-semibold text-gray-700">Fecha Creación</th>
             </tr>
           </thead>
@@ -131,14 +128,9 @@
               @click="selectExport(exportItem)"
               :class="{ 'bg-blue-100': selectedExport?.id === exportItem.id }"
             >
-              <td class="py-3 px-4 text-gray-900 font-medium">#{{ exportItem.id }}</td>
-              <td class="py-3 px-4 text-gray-700">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  {{ exportItem.user_id }}
-                </span>
-              </td>
-              <td class="py-3 px-4 text-gray-700 max-w-xs truncate" :title="exportItem.commercial_description">
-                {{ exportItem.commercial_description }}
+              <td class="py-3 px-4 text-gray-900 font-medium">#{{ exportItem.id.substring(0, 4) }}</td>
+              <td class="py-3 px-4 text-gray-700 max-w-xs truncate" :title="exportItem.comercial_description">
+                {{ exportItem.comercial_description }}
               </td>
               <td class="py-3 px-4 text-gray-700">
                 <span :class="[
@@ -155,18 +147,7 @@
               </td>
               <td class="py-3 px-4 text-gray-700">{{ exportItem.gross_weight.toLocaleString() }}</td>
               <td class="py-3 px-4 text-gray-700">{{ exportItem.net_weight.toLocaleString() }}</td>
-              <td class="py-3 px-4 text-gray-700">{{ exportItem.unit }}</td>
               <td class="py-3 px-4 text-gray-700 font-medium">{{ exportItem.quantity.toLocaleString() }}</td>
-              <td class="py-3 px-4">
-                <span
-                  :class="[
-                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                    getStatusClass(exportItem.status)
-                  ]"
-                >
-                  {{ getStatusLabel(exportItem.status) }}
-                </span>
-              </td>
               <td class="py-3 px-4 text-gray-600">{{ formatDate(exportItem.created_at) }}</td>
             </tr>
           </tbody>
@@ -181,49 +162,6 @@
       </div>
     </div>
 
-    <!-- Statistics -->
-    <div class="grid grid-cols-4 gap-4">
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center gap-3 mb-2">
-          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-          </svg>
-          <span class="text-3xl font-bold text-gray-900">{{ statistics.originPorts }}</span>
-        </div>
-        <p class="text-sm text-gray-600">Puertos Origen</p>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center gap-3 mb-2">
-          <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-          </svg>
-          <span class="text-3xl font-bold text-gray-900">{{ statistics.destinationPorts }}</span>
-        </div>
-        <p class="text-sm text-gray-600">Puertos Destino</p>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center gap-3 mb-2">
-          <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9 12l-4.95 2.6L3 13.5 6.5 9H3L1.5 7.5 2.3 5l2.7.8L7.5 3H9l-.5 3.5L12 5l.5 1.5-1.5 1.5h3.5l-3.5 4.5z"/>
-          </svg>
-          <span class="text-3xl font-bold text-gray-900">{{ statistics.maritimeRoutes }}</span>
-        </div>
-        <p class="text-sm text-gray-600">Rutas Marítimas</p>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center gap-3 mb-2">
-          <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
-          </svg>
-          <span class="text-3xl font-bold text-gray-900">{{ statistics.airRoutes }}</span>
-        </div>
-        <p class="text-sm text-gray-600">Rutas Aéreas</p>
-      </div>
-    </div>
-    
     <!-- Export Creation Modal -->
     <div
         v-if="showExportModal"
@@ -347,6 +285,10 @@ const EyeIcon = () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'curren
   h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', 'd': 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' })
 ]);
 
+const RouteIcon = () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', 'd': 'M13 10V3L4 14h7v7l9-11h-7z' })
+]);
+
 const ShipIcon = () => h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 0 20 20' }, [
   h('path', { d: 'M9 12l-4.95 2.6L3 13.5 6.5 9H3L1.5 7.5 2.3 5l2.7.8L7.5 3H9l-.5 3.5L12 5l.5 1.5-1.5 1.5h3.5l-3.5 4.5z' })
 ]);
@@ -369,6 +311,9 @@ export default {
     const loadingExports = ref(false);
     const selectedExport = ref(null);
     
+    // Track if an optimal route is currently displayed
+    const hasActiveOptimalRoute = ref(false);
+
     // Pending export from optimization
     const pendingExport = ref(null);
     const showExportModal = ref(false);
@@ -379,10 +324,27 @@ export default {
     });
     const savingExport = ref(false);
 
+    const handleTransportModeClick = (modeId) => {
+      if (modeId === 'route') {
+        // Toggle the optimal route visibility
+        hasActiveOptimalRoute.value = !hasActiveOptimalRoute.value;
+        if (!hasActiveOptimalRoute.value) {
+          // Just hide the optimal route, don't clear the edges
+          optimalRoute.value = [];
+        } else if (selectedExport.value) {
+          // Re-display the optimal route for the selected export without clearing edges
+          selectExport(selectedExport.value);
+        }
+      } else {
+        activeTransportMode.value = modeId;
+        // Keep the optimal route visible if it was previously shown
+      }
+    };
+
     const transportModes = [
-      { id: 'all', label: 'Etiquetas', icon: EyeIcon, activeClass: 'bg-blue-500 text-white' },
+      { id: 'route', label: 'Ver Ruta Óptima', icon: RouteIcon, activeClass: 'bg-purple-500 text-white' },
       { id: 'maritime', label: 'Marítimo', icon: ShipIcon, activeClass: 'bg-blue-500 text-white' },
-      { id: 'air', label: 'Aéreo', icon: PlaneIcon, activeClass: 'bg-purple-500 text-white' }
+      { id: 'air', label: 'Aéreo', icon: PlaneIcon, activeClass: 'bg-indigo-500 text-white' }
     ];
 
     const statistics = computed(() => ({
@@ -390,6 +352,8 @@ export default {
       destinationPorts: graphNodes.value.filter(n => n.type === 'destination').length,
       maritimeRoutes: graphEdges.value.filter(e => e.mode === 'maritime').length,
       airRoutes: graphEdges.value.filter(e => e.mode === 'air').length,
+      totalPorts: graphNodes.value.length,
+      totalRoutes: graphEdges.value.length
     }));
 
     const getStatusClass = (status) => {
@@ -424,6 +388,45 @@ export default {
       });
     };
 
+    /**
+     * Normaliza los campos de exportación desde diferentes fuentes de API
+     */
+    const normalizeExportData = (exportItem) => {
+      // Extrae comercial_description con múltiples fallbacks
+      const getCommercialDescription = () => {
+        // Prioridad 1: comercial_description
+        if (exportItem.comercial_description && exportItem.comercial_description.trim()) {
+          return exportItem.comercial_description.trim();
+        }
+        // Prioridad 2: commercial_description
+        if (exportItem.commercial_description && exportItem.commercial_description.trim()) {
+          return exportItem.commercial_description.trim();
+        }
+        // Prioridad 3: description
+        if (exportItem.description && exportItem.description.trim()) {
+          return exportItem.description.trim();
+        }
+        // Fallback
+        return 'Sin descripción';
+      };
+
+      const normalized = {
+        ...exportItem,
+        comercial_description: getCommercialDescription(),
+        transportation_mode: exportItem.transportation_mode || exportItem.transport_mode || 'maritime',
+        us_fob: exportItem.us_fob || exportItem.fob || 0,
+        gross_weight: exportItem.gross_weight || exportItem.peso_bruto || 0,
+        net_weight: exportItem.net_weight || exportItem.peso_neto || 0,
+        quantity: exportItem.quantity || exportItem.cantidad || 0,
+        created_at: exportItem.created_at || exportItem.fecha_creacion || new Date().toISOString(),
+        id: exportItem.id || Math.random().toString(36).substr(2, 9),
+        optimized_route_id: exportItem.optimized_route_id || null,
+        optimized_route: exportItem.optimized_route || null
+      };
+
+      return normalized;
+    };
+
     const loadGraphData = async () => {
       try {
         const [nodesRes, edgesRes] = await Promise.all([
@@ -445,7 +448,12 @@ export default {
     const loadExports = async () => {
       loadingExports.value = true;
       try {
-        exportsList.value = await ExportService.getAllExports();
+        const data = await ExportService.getAllExports();
+        if (data && data.length > 0) {
+          exportsList.value = data.map(exp => normalizeExportData(exp));
+        } else {
+          exportsList.value = data;
+        }
       } catch (error) {
         console.error('Error loading exports:', error);
         exportsList.value = [];
@@ -454,31 +462,92 @@ export default {
       }
     };
 
+
+    const findPortNodeByName = (portName) => {
+      if (!portName) return null;
+
+      const normalizedSearchName = portName.toLowerCase().trim();
+
+      let node = graphNodes.value.find(n =>
+        n.name && n.name.toLowerCase() === normalizedSearchName
+      );
+      if (node) {
+        return node;
+      }
+
+      const firstWord = normalizedSearchName.split(/[(\s]+/)[0];
+      if (firstWord && firstWord.length > 0) {
+        node = graphNodes.value.find(n =>
+          n.name && n.name.toLowerCase().startsWith(firstWord)
+        );
+        if (node) {
+          return node;
+        }
+      }
+
+      node = graphNodes.value.find(n =>
+        n.name && n.name.toLowerCase().includes(normalizedSearchName)
+      );
+      if (node) {
+        return node;
+      }
+
+      const codeMatch = normalizedSearchName.match(/\(([A-Z]{3})/);
+      if (codeMatch) {
+        const code = codeMatch[1];
+        node = graphNodes.value.find(n =>
+          n.name && n.name.toUpperCase().includes(code)
+        );
+        if (node) {
+          return node;
+        }
+      }
+
+      return null;
+    };
+
     const selectExport = async (exportItem) => {
       selectedExport.value = exportItem;
 
-      console.log('📍 Export seleccionado:', exportItem);
-
       try {
-        // If export has optimized_route in the response, use it directly
+        // Reset all nodes to intermediate type first
+        graphNodes.value = graphNodes.value.map(node => ({
+          ...node,
+          type: 'intermediate'
+        }));
+
         if (exportItem.optimized_route && exportItem.optimized_route.visited_ports) {
           const routeData = exportItem.optimized_route;
-          console.log('✅ Ruta optimizada encontrada en export:', routeData);
-          
+
           // Create edges between consecutive ports using visited_ports
           const routeEdges = [];
           const visitedPorts = routeData.visited_ports;
           
+          // Mark first port as origin, last as destination
+          if (visitedPorts.length > 0) {
+            const firstPortName = visitedPorts[0];
+            const lastPortName = visitedPorts[visitedPorts.length - 1];
+
+            graphNodes.value = graphNodes.value.map(node => {
+              if (findPortNodeByName(firstPortName)?.id === node.id) {
+                return { ...node, type: 'origin' };
+              } else if (findPortNodeByName(lastPortName)?.id === node.id && findPortNodeByName(firstPortName)?.id !== node.id) {
+                return { ...node, type: 'destination' };
+              }
+              return node;
+            });
+          }
+
           for (let i = 0; i < visitedPorts.length - 1; i++) {
             const fromPortName = visitedPorts[i];
             const toPortName = visitedPorts[i + 1];
             
-            // Find port nodes by name
-            const fromNode = graphNodes.value.find(n => n.name === fromPortName);
-            const toNode = graphNodes.value.find(n => n.name === toPortName);
-            
+            // Find port nodes by name with flexible matching
+            const fromNode = findPortNodeByName(fromPortName);
+            const toNode = findPortNodeByName(toPortName);
+
             if (!fromNode || !toNode) {
-              console.warn(`Port not found: ${fromPortName} or ${toPortName}`);
+              console.warn(`Puerto no encontrado: ${fromPortName} o ${toPortName}`);
               continue;
             }
             
@@ -505,8 +574,8 @@ export default {
           }
           
           optimalRoute.value = routeEdges;
-          console.log('🎯 Ruta óptima cargada:', routeEdges.length, 'conexiones');
-          
+          hasActiveOptimalRoute.value = true;
+
         } else if (exportItem.optimized_route_id) {
           // Export has route ID but not the full route data
           // Try to fetch the route separately
@@ -514,21 +583,35 @@ export default {
           
           try {
             const routeData = await ExportService.getRouteById(exportItem.optimized_route_id);
-            console.log('✅ Ruta cargada desde API:', routeData);
-            
+
+            // Mark first port as origin, last as destination
+            const visitedPorts = routeData.visited_ports || [];
+            if (visitedPorts.length > 0) {
+              const firstPortName = visitedPorts[0];
+              const lastPortName = visitedPorts[visitedPorts.length - 1];
+
+              graphNodes.value = graphNodes.value.map(node => {
+                if (findPortNodeByName(firstPortName)?.id === node.id) {
+                  return { ...node, type: 'origin' };
+                } else if (findPortNodeByName(lastPortName)?.id === node.id && findPortNodeByName(firstPortName)?.id !== node.id) {
+                  return { ...node, type: 'destination' };
+                }
+                return node;
+              });
+            }
+
             // Create edges using the fetched route data
             const routeEdges = [];
-            const visitedPorts = routeData.visited_ports || [];
-            
+
             for (let i = 0; i < visitedPorts.length - 1; i++) {
               const fromPortName = visitedPorts[i];
               const toPortName = visitedPorts[i + 1];
               
-              const fromNode = graphNodes.value.find(n => n.name === fromPortName);
-              const toNode = graphNodes.value.find(n => n.name === toPortName);
-              
+              const fromNode = findPortNodeByName(fromPortName);
+              const toNode = findPortNodeByName(toPortName);
+
               if (!fromNode || !toNode) {
-                console.warn(`Port not found: ${fromPortName} or ${toPortName}`);
+                console.warn(`Puerto no encontrado: ${fromPortName} o ${toPortName}`);
                 continue;
               }
               
@@ -553,16 +636,18 @@ export default {
             }
             
             optimalRoute.value = routeEdges;
+            hasActiveOptimalRoute.value = true;
             console.log('🎯 Ruta óptima cargada desde API:', routeEdges.length, 'conexiones');
             
           } catch (routeError) {
             console.error('❌ Error cargando ruta:', routeError);
             optimalRoute.value = [];
+            hasActiveOptimalRoute.value = false;
           }
-          
         } else {
           console.warn('Export no tiene ruta optimizada asociada');
           optimalRoute.value = [];
+          hasActiveOptimalRoute.value = false;
         }
 
       } catch (error) {
@@ -702,9 +787,9 @@ export default {
                 const fromPortName = visitedPorts[i];
                 const toPortName = visitedPorts[i + 1];
                 
-                const fromNode = graphNodes.value.find(n => n.name === fromPortName);
-                const toNode = graphNodes.value.find(n => n.name === toPortName);
-                
+                const fromNode = findPortNodeByName(fromPortName);
+                const toNode = findPortNodeByName(toPortName);
+
                 if (fromNode && toNode) {
                   routeEdges.push(new GraphEdge({
                     source: fromNode.id,
@@ -716,6 +801,7 @@ export default {
               }
               
               optimalRoute.value = routeEdges;
+              hasActiveOptimalRoute.value = true;
               console.log('🎯 Ruta pendiente cargada en el mapa:', routeEdges.length, 'conexiones');
             }
           }, 1000);
@@ -732,6 +818,7 @@ export default {
       graphNodes,
       graphEdges,
       optimalRoute,
+      hasActiveOptimalRoute,
       statistics,
       exportsList,
       loadingExports,
@@ -745,7 +832,9 @@ export default {
       selectExport,
       getStatusClass,
       getStatusLabel,
-      formatDate
+      formatDate,
+      handleTransportModeClick,
+      findPortNodeByName
     };
   }
 };

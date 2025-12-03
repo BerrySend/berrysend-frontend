@@ -1,38 +1,17 @@
-/**
- * Vue Router Configuration
- * Defines application routes organized by bounded contexts
- *
- * @module router
- */
-
 import { createRouter, createWebHistory } from 'vue-router';
 import { requireAuth, requireGuest } from '@/auth/guards/auth.guard.js';
 
-// Auth Module
 const LoginPage = () => import('../auth/pages/login-page.component.vue');
 const RegisterPage = () => import('../auth/pages/register-page.component.vue');
-
-// Port Management Module
 const PortManagementPage = () => import('../port-management/pages/port-page.component.vue');
-
-// Route Optimization Module
 const OptimizationPage = () => import('../route-optimization/pages/optimization-page.component.vue');
-
-// Visualization Module
 const VisualizationPage = () => import('../export-management/pages/visualization-page.component.vue');
 
-// Shipment Planning Module
-//const ShipmentPlanningPage = () => import('../modules/shipment-planning/pages/shipment-planning-page.component.vue');
-
-/**
- * Route definitions
- */
 const routes = [
     {
         path: '/',
         redirect: '/management'
     },
-    // Auth Routes (Public)
     {
         path: '/login',
         name: 'Login',
@@ -57,7 +36,6 @@ const routes = [
         },
         beforeEnter: requireGuest
     },
-    // Protected Routes
     {
         path: '/management',
         name: 'PortManagement',
@@ -97,7 +75,6 @@ const routes = [
     {
         path: '/shipments',
         name: 'ShipmentPlanning',
-        //component: ShipmentPlanningPage,
         meta: {
             title: 'Shipment Planning',
             description: 'Create and manage shipment plans',
@@ -113,9 +90,6 @@ const routes = [
     }
 ];
 
-/**
- * Create router instance
- */
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes,
@@ -128,23 +102,15 @@ const router = createRouter({
     }
 });
 
-/**
- * Navigation guard to update page title
- */
 router.beforeEach((to, from, next) => {
-    // Update document title based on route meta
     if (to.meta.title) {
         document.title = `${to.meta.title} - BerrySend`;
     } else {
         document.title = 'BerrySend - Route Optimization Platform';
     }
-
     next();
 });
 
-/**
- * Global error handler for navigation failures
- */
 router.onError((error) => {
     console.error('Router error:', error);
 });

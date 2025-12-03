@@ -22,6 +22,8 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import AppHeader from '@/shared/components/app-header.component.vue';
 import AppNav from '@/shared/components/app-nav.component.vue';
+import PortService from '@/port-management/services/port.service.js';
+import ExportService from '@/export-management/services/export.service.js';
 
 /**
  * MainLayout Component
@@ -45,10 +47,49 @@ export default {
 
     // Header statistics
     const headerStats = ref({
-      originPorts: 3,
-      destinations: 6,
-      activeRoutes: 13
+      totalPorts: 0,
+      activeRoutes: 0
     });
+
+    /**
+     * Load statistics from API
+     */
+    const loadStatistics = async () => {
+      try {
+        // Get all ports
+        try {
+          const ports = await PortService.getAllPorts();
+
+          if (Array.isArray(ports)) {
+            headerStats.value.totalPorts = ports.length;
+          } else {
+            console.warn('⚠️ Ports is not an array:', ports);
+            headerStats.value.totalPorts = 0;
+          }
+        } catch (portError) {
+          console.error('❌ Error fetching ports:', portError);
+          headerStats.value.totalPorts = 0;
+        }
+
+        // Get all exports (active routes)
+        try {
+          const exports = await ExportService.getAllExports();
+
+          if (Array.isArray(exports)) {
+            headerStats.value.activeRoutes = exports.length;
+          } else {
+            console.warn('⚠️ Exports has unexpected format:', exports);
+            headerStats.value.activeRoutes = 0;
+          }
+        } catch (exportError) {
+          console.error('❌ Error fetching exports:', exportError);
+          console.error('❌ Error message:', exportError.message);
+          headerStats.value.activeRoutes = 0;
+        }
+      } catch (error) {
+        console.error('❌ Unexpected error in loadStatistics:', error);
+      }
+    };
 
     /**
      * Handle tab change navigation
@@ -85,6 +126,7 @@ export default {
 
     onMounted(() => {
       updateActiveTab();
+      loadStatistics();
     });
 
     return {

@@ -20,7 +20,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-3 gap-4 mb-6">
       <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
         <div class="flex items-center gap-3 mb-2">
           <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,17 +52,6 @@
           <span class="text-2xl font-bold text-gray-900">{{ statistics.airRoutes }}</span>
         </div>
         <p class="text-sm text-gray-600">Rutas Aéreas</p>
-      </div>
-
-      <div class="stat-card bg-white rounded-xl p-5 border border-gray-200">
-        <div class="flex items-center gap-3 mb-2">
-          <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-          </svg>
-          <span class="text-2xl font-bold text-gray-900">{{ statistics.averageTime }}</span>
-        </div>
-        <p class="text-sm text-gray-600">Tiempo Promedio (días)</p>
       </div>
     </div>
 
@@ -185,19 +174,25 @@ export default {
     const searchQuery = ref('');
     const activeFilter = ref('all');
 
-    const statistics = ref({
-      totalPorts: 12,
-      maritimeRoutes: 10,
-      airRoutes: 3,
-      averageTime: 12.4
+    const statistics = computed(() => {
+      const totalConnections = ports.value.reduce((sum, port) => sum + (port.connections || 0), 0);
+      // Estimar proporción de rutas marítimas vs aéreas
+      // Por defecto, aproximadamente 70% marítimas y 30% aéreas en transporte internacional
+      const maritimeCount = Math.ceil(totalConnections * 0.7);
+      const airCount = Math.ceil(totalConnections * 0.3);
+
+      return {
+        totalPorts: ports.value.length,
+        maritimeRoutes: maritimeCount,
+        airRoutes: airCount
+      };
     });
 
     // Filter options
     const filters = [
-      { value: 'all', label: 'All' },
-      { value: 'origin', label: 'Origin' },
-      { value: 'destination', label: 'Destination' },
-      { value: 'intermediate', label: 'Intermediate' }
+      { value: 'all', label: 'Todos' },
+      { value: 'national', label: 'Nacionales' },
+      { value: 'international', label: 'Internacionales' }
     ];
 
     /**
@@ -206,9 +201,13 @@ export default {
     const filteredPorts = computed(() => {
       let result = ports.value;
 
-      // Apply type filter
+      // Apply country filter
       if (activeFilter.value !== 'all') {
-        result = result.filter(port => port.type === activeFilter.value);
+        if (activeFilter.value === 'national') {
+          result = result.filter(port => port.country?.toLowerCase() === 'peru');
+        } else if (activeFilter.value === 'international') {
+          result = result.filter(port => port.country?.toLowerCase() !== 'peru');
+        }
       }
 
       // Apply search filter

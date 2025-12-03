@@ -124,6 +124,25 @@ export class Port {
     }
 
     /**
+     * Gets the location type: Nacional (Peru) or Internacional (other countries)
+     *
+     * @returns {string} 'nacional' or 'internacional'
+     */
+    getLocationType() {
+        const peruCountries = ['Peru', 'Perú', 'peru', 'perú', 'PERU', 'PERÚ'];
+        return peruCountries.includes(this.country) ? 'nacional' : 'internacional';
+    }
+
+    /**
+     * Gets the display label for location type
+     *
+     * @returns {string} 'Nacional' or 'Internacional'
+     */
+    getLocationTypeLabel() {
+        return this.getLocationType() === 'nacional' ? 'Nacional' : 'Internacional';
+    }
+
+    /**
      * Converts port to plain object for API transmission
      *
      * @returns {Object} Plain object representation
@@ -150,15 +169,27 @@ export class Port {
      */
     static fromAPI(data) {
         // Map backend response to frontend model
+        // Handle both formats: direct lat/lng properties OR nested coordinates object
+        let latitude = 0;
+        let longitude = 0;
+
+        if (data.coordinates && typeof data.coordinates === 'object') {
+            latitude = data.coordinates.latitude || 0;
+            longitude = data.coordinates.longitude || 0;
+        } else {
+            latitude = data.latitude || 0;
+            longitude = data.longitude || 0;
+        }
+
         return new Port({
             id: data.id,
             name: data.name,
             country: data.country,
-            type: data.type || 'intermediate', // maritime/air from backend
+            type: data.type || 'intermediate',
             capacity: data.capacity || 0,
             coordinates: {
-                latitude: data.latitude || 0,
-                longitude: data.longitude || 0
+                latitude,
+                longitude
             },
             connections: data.connections || 0,
             createdAt: data.createdAt || data.created_at,

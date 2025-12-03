@@ -3,19 +3,15 @@
     <div class="flex items-center justify-between">
       <!-- Logo and Title -->
       <div class="flex items-center gap-3">
-        <div class="logo-container w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-          </svg>
+        <div class="logo-container">
+          <img
+            src="@/assets/berrysend_logo.png"
+            alt="BerrySend Logo"
+            class="h-12 w-auto object-contain rounded-xl"
+          />
         </div>
         <div>
-          <h1 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-            BerrySend
-            <span class="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-md font-semibold">
-              Pro
-            </span>
-          </h1>
+          <h1 class="text-xl font-bold text-gray-900">BerrySend</h1>
           <p class="text-sm text-gray-600">
             Optimización matemática de rutas para exportación de arándanos desde Perú
           </p>
@@ -25,14 +21,9 @@
       <!-- Statistics and User Menu -->
       <div class="flex items-center gap-8">
         <StatCard
-            :value="statistics.originPorts"
-            label="Puertos de Origen"
+            :value="statistics.totalPorts"
+            label="Puertos"
             color="blue"
-        />
-        <StatCard
-            :value="statistics.destinations"
-            label="Destinos"
-            color="purple"
         />
         <StatCard
             :value="statistics.activeRoutes"
@@ -78,13 +69,6 @@
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/shared/stores/auth.store.js';
 import StatCard from '@/shared/components/stat-card.component.vue';
-
-/**
- * AppHeader Component
- * Application header with branding and key statistics
- *
- * @component
- */
 export default {
   name: 'AppHeader',
 
@@ -101,8 +85,7 @@ export default {
       required: true,
       validator: (value) => {
         return (
-            typeof value.originPorts === 'number' &&
-            typeof value.destinations === 'number' &&
+            typeof value.totalPorts === 'number' &&
             typeof value.activeRoutes === 'number'
         );
       }

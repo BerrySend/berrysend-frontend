@@ -31,21 +31,18 @@ export class GraphEdge {
      * @param {boolean} data.isOptimal - Whether this edge is part of optimal route
      */
     constructor(data = {}) {
-        // ✅ Mapear campos del backend (port_a_id, port_b_id) a fuente/destino
         this.id = data.id || `${data.source || data.port_a_id}-${data.target || data.port_b_id}`;
         this.source = data.source || data.port_a_id || null;
         this.target = data.target || data.port_b_id || null;
         this.mode = data.mode || data.route_type || TransportMode.MARITIME;
 
-        // ✅ Mapear campos del backend (distance_km, time_hours, cost_usd)
         this.distance = data.distance || data.distance_km || 0;
         this.time = data.time || data.time_hours || 0;
         this.cost = data.cost || data.cost_usd || 0;
         this.isOptimal = data.isOptimal || false;
 
-        // ✅ Guardar nombres para referencia
-        this.sourcePort = data.port_a_name || null;
-        this.targetPort = data.port_b_name || null;
+        this.sourceName = data.port_a_name || null;
+        this.targetName = data.port_b_name || null;
         this.isRestricted = data.is_restricted || false;
     }
 

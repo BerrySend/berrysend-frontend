@@ -405,9 +405,6 @@ export default {
       loadingPorts.value = true;
       try {
         const ports = await portService.getAllPorts();
-        console.log('✅ Puertos cargados:', ports);
-        console.log('📍 Primer puerto:', ports[0]);
-        console.log('🔑 ID del primer puerto:', ports[0]?.id);
         originPorts.value = ports;
         destinationPorts.value = ports;
       } catch (error) {
@@ -425,6 +422,10 @@ export default {
       loadingAlgorithms.value = true;
       try {
         algorithms.value = await optimizationService.getAvailableAlgorithms();
+
+        // Validar que cada algoritmo tiene la información completa
+        algorithms.value.forEach((algo, idx) => {
+        });
 
         // Select recommended algorithm by default
         const recommended = algorithms.value.find(algo => algo.isRecommended);
@@ -455,18 +456,10 @@ export default {
 
       isOptimizing.value = true;
       try {
-        console.log('🔍 DEBUG - Config antes de enviar:');
-        console.log('  originPortId:', config.value.originPortId);
-        console.log('  destinationPortId:', config.value.destinationPortId);
-        console.log('  Tipo de originPortId:', typeof config.value.originPortId);
-        console.log('  Tipo de destinationPortId:', typeof config.value.destinationPortId);
-        
         // Determine mode based on origin port name
         const originPort = originPorts.value.find(p => p.id === config.value.originPortId);
         const isAirPort = originPort?.name?.includes('(') && originPort?.name?.includes(')');
         const transportMode = isAirPort ? 'air' : 'maritime';
-        
-        console.log('🚢 Puerto origen:', originPort?.name, '→ Modo:', transportMode);
         
         // Prepare params according to backend API specification
         const params = {
@@ -477,8 +470,6 @@ export default {
           export_weight: config.value.cargoAmount
         };
         
-        console.log('📤 Params a enviar:', JSON.stringify(params, null, 2));
-
         // Only add parameters for bellman-ford
         if (selectedAlgorithm.value.id === 'bellman-ford') {
           params.parameters = {
@@ -537,8 +528,6 @@ export default {
       comparisonResults.value = [];
       
       try {
-        console.log('🔍 Comparando todos los algoritmos...');
-        
         const results = [];
         
         // Determine mode based on origin port name
@@ -582,7 +571,6 @@ export default {
               success: true
             });
             
-            console.log(`✅ ${algorithm.name}: ${result.total_cost} USD, ${result.total_distance} km, ${result.total_time} hrs`);
           } catch (error) {
             console.error(`❌ Error con ${algorithm.name}:`, error);
             results.push({
@@ -605,8 +593,6 @@ export default {
         }
         
         comparisonResults.value = results;
-        
-        console.log('📊 Comparación completada:', results);
         
       } catch (error) {
         console.error('Error comparing algorithms:', error);

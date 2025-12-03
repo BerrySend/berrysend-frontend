@@ -26,14 +26,34 @@ class OptimizationService {
             const response = await axios.get(buildApiUrl('algorithms'), {
                 timeout: getApiTimeout()
             });
-            return Algorithm.fromAPIArray(response.data);
+
+            // Merge API response with predefined data to ensure all fields are present
+            const algorithms = response.data.map(apiAlgo => {
+                // Find matching predefined algorithm to fill in missing fields
+                const predefinedKey = Object.keys(PredefinedAlgorithms).find(
+                    key => PredefinedAlgorithms[key].id === apiAlgo.id
+                );
+
+                const predefined = predefinedKey ? PredefinedAlgorithms[predefinedKey] : null;
+
+                // Merge data: API data takes priority, but use predefined for missing fields
+                const mergedData = {
+                    ...predefined,
+                    ...apiAlgo
+                };
+
+                return Algorithm.fromAPI(mergedData);
+            });
+
+            return algorithms;
         } catch (error) {
             console.error('Error fetching algorithms:', error);
 
             // Fallback to predefined algorithms if API fails
-            return Object.values(PredefinedAlgorithms).map(algo =>
-                Algorithm.fromAPI(algo)
-            );
+            return Object.values(PredefinedAlgorithms).map(algo => {
+                const instance = Algorithm.fromAPI(algo);
+                return instance;
+            });
         }
     }
 
@@ -49,7 +69,21 @@ class OptimizationService {
             const response = await axios.get(`${buildApiUrl('algorithms')}/${algorithmId}`, {
                 timeout: getApiTimeout()
             });
-            return Algorithm.fromAPI(response.data);
+
+            // Find matching predefined algorithm to fill in missing fields
+            const predefinedKey = Object.keys(PredefinedAlgorithms).find(
+                key => PredefinedAlgorithms[key].id === algorithmId
+            );
+
+            const predefined = predefinedKey ? PredefinedAlgorithms[predefinedKey] : null;
+
+            // Merge data: API data takes priority, but use predefined for missing fields
+            const mergedData = {
+                ...predefined,
+                ...response.data
+            };
+
+            return Algorithm.fromAPI(mergedData);
         } catch (error) {
             console.error(`Error fetching algorithm ${algorithmId}:`, error);
 

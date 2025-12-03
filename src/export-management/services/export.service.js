@@ -15,12 +15,27 @@ class ExportService {
      */
     async getAllExports() {
         try {
-            const response = await axios.get(buildApiUrl('exports'), {
+            const url = buildApiUrl('exports');
+            const response = await axios.get(url, {
                 timeout: getApiTimeout()
             });
+
             return response.data;
         } catch (error) {
-            console.error('Error fetching exports:', error);
+            console.error('ExportService error fetching exports:', error);
+            console.error('Error code:', error.code);
+            console.error('Error message:', error.message);
+            if (error.response) {
+                console.error('Error response status:', error.response.status);
+                console.error('Error response data:', error.response.data);
+            }
+
+            // Handle "No exports found" as empty array instead of error
+            if (error.response?.status === 400 &&
+                error.response?.data?.detail?.includes('No exports found')) {
+                return [];
+            }
+
             if (error.response?.status === 401) {
                 throw new Error('Authentication required');
             }
@@ -243,4 +258,3 @@ class ExportService {
 }
 
 export default new ExportService();
-
